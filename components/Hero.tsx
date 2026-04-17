@@ -3,15 +3,30 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 import { SITE } from "@/lib/data";
-import AnimatedText from "./AnimatedText";
 import MagneticButton from "./MagneticButton";
-import ScrollIndicator from "./ScrollIndicator";
 
 const container = {
   hidden: { opacity: 1 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
+  },
+};
+
+const lineVariant = {
+  hidden: {
+    opacity: 0,
+    y: 60,
+    filter: "blur(12px)",
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.8,
+      ease: [0.16, 1, 0.3, 1],
+    },
   },
 };
 
@@ -50,12 +65,29 @@ export default function Hero() {
 
           {/* Main headline with staggered reveal */}
           <div className="h-display flex flex-col">
-            <AnimatedText text="Building" delay={0.3} />
-            <span className="gradient-text">
-              <AnimatedText text="on-chain" delay={0.5} />
-            </span>
-            <AnimatedText text="& intelligent" delay={0.7} />
-            <AnimatedText text="experiences." delay={0.9} />
+            <div className="overflow-hidden">
+              <motion.span variants={lineVariant} className="block">
+                Building
+              </motion.span>
+            </div>
+            <div className="overflow-hidden">
+              <motion.span
+                variants={lineVariant}
+                className="block gradient-text"
+              >
+                on-chain
+              </motion.span>
+            </div>
+            <div className="overflow-hidden">
+              <motion.span variants={lineVariant} className="block">
+                & intelligent
+              </motion.span>
+            </div>
+            <div className="overflow-hidden">
+              <motion.span variants={lineVariant} className="block">
+                experiences.
+              </motion.span>
+            </div>
           </div>
 
           {/* Description */}
@@ -115,9 +147,6 @@ export default function Hero() {
             </a>
           </motion.div>
         </motion.div>
-
-        {/* Scroll indicator - fades out on scroll */}
-        <ScrollIndicator />
       </div>
     </section>
   );
