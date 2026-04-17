@@ -88,14 +88,18 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
     <motion.div
       ref={ref}
       layout
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
+      initial={{ opacity: 0, y: 24, scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.7, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
       onMouseMove={handleMouse}
       onMouseLeave={handleLeave}
       style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      className="glass-card group relative flex h-full flex-col p-7 sm:p-8 overflow-hidden"
+      className="glass-card group relative flex h-full flex-col p-7 sm:p-8 overflow-hidden will-change-transform"
+      whileHover={{
+        y: -8,
+        transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
+      }}
     >
       {/* Gradient glow under cursor */}
       <motion.div

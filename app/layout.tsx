@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import GradientOrbs from "@/components/GradientOrbs";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
   title: "Alexander Christian · Blockchain & AI Developer",
@@ -67,8 +68,9 @@ export default function RootLayout({
         />
       </head>
       <body className="relative min-h-screen font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <GradientOrbs />
+          <ScrollProgress />
           <div className="relative z-10 flex min-h-screen flex-col">
             <Navigation />
             <main className="flex-1">{children}</main>

@@ -13,6 +13,22 @@ const NAV = [
   { label: "Contact", href: "#contact" },
 ];
 
+function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+  e.preventDefault();
+  const target = document.querySelector(href);
+  if (target) {
+    // Account for sticky header height (approx 80px including padding)
+    const headerOffset = 100;
+    const elementPosition = target.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: "smooth",
+    });
+  }
+}
+
 export default function Navigation() {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -39,7 +55,11 @@ export default function Navigation() {
             scrolled ? "glass-strong shadow-lg" : "bg-transparent"
           }`}
         >
-          <Link href="#top" className="group flex items-center gap-2.5 font-mono text-sm">
+          <Link
+            href="#top"
+            onClick={(e) => handleNavClick(e, "#top")}
+            className="group flex items-center gap-2.5 font-mono text-sm"
+          >
             <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-accent-500 text-white font-semibold text-[13px] shadow-[0_0_20px_rgba(59,130,246,0.5)]">
               A
               <span className="absolute inset-0 rounded-full bg-accent-500 opacity-40 blur-md group-hover:opacity-70 transition-opacity" />
@@ -52,6 +72,7 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={(e) => handleNavClick(e, item.href)}
                 className="relative px-3.5 py-2 text-sm text-[rgb(var(--fg-muted))] hover:text-[rgb(var(--fg))] transition-colors"
               >
                 {item.label}
@@ -85,7 +106,10 @@ export default function Navigation() {
             <Link
               key={item.href}
               href={item.href}
-              onClick={() => setOpen(false)}
+              onClick={(e) => {
+                handleNavClick(e, item.href);
+                setOpen(false);
+              }}
               className="block rounded-xl px-4 py-3 text-sm font-medium text-[rgb(var(--fg))] hover:bg-[rgb(var(--fg)/0.05)] transition-colors"
             >
               {item.label}

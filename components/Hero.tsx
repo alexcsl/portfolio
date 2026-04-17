@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 import { SITE } from "@/lib/data";
+import AnimatedText from "./AnimatedText";
+import MagneticButton from "./MagneticButton";
 
 const container = {
   hidden: { opacity: 0 },
@@ -45,13 +46,17 @@ export default function Hero() {
             </span>
           </motion.div>
 
-          <motion.h1 variants={item} className="h-display">
-            Building <span className="gradient-text">on-chain</span>
+          <h1 className="h-display">
+            <AnimatedText text="Building" />
             <br />
-            &amp; intelligent
+            <span className="gradient-text">
+              <AnimatedText text="on-chain" />
+            </span>
             <br />
-            experiences.
-          </motion.h1>
+            <AnimatedText text="& intelligent" />
+            <br />
+            <AnimatedText text="experiences." />
+          </h1>
 
           <motion.p
             variants={item}
@@ -63,12 +68,20 @@ export default function Hero() {
           </motion.p>
 
           <motion.div variants={item} className="flex flex-wrap gap-3 pt-2">
-            <Link href="#projects" className="btn-primary">
+            <MagneticButton
+              href="#projects"
+              className="btn-primary"
+              strength={0.2}
+            >
               View projects <ArrowUpRight className="h-4 w-4" />
-            </Link>
-            <Link href="#contact" className="btn-ghost">
+            </MagneticButton>
+            <MagneticButton
+              href="#contact"
+              className="btn-ghost"
+              strength={0.2}
+            >
               Get in touch
-            </Link>
+            </MagneticButton>
           </motion.div>
 
           <motion.div variants={item} className="flex items-center gap-5 pt-2">
