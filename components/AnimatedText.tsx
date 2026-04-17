@@ -5,58 +5,65 @@ import { motion } from "framer-motion";
 interface AnimatedTextProps {
   text: string;
   className?: string;
-  once?: boolean;
+  delay?: number;
+  as?: "span" | "div";
 }
 
 export default function AnimatedText({
   text,
   className = "",
-  once = true,
+  delay = 0,
+  as: Component = "span",
 }: AnimatedTextProps) {
   const words = text.split(" ");
 
   const container = {
-    hidden: { opacity: 0 },
-    visible: (i = 1) => ({
+    hidden: { opacity: 1 },
+    visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 0.04 * i },
-    }),
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: delay,
+      },
+    },
   };
 
   const child = {
     hidden: {
       opacity: 0,
-      y: 20,
-      filter: "blur(10px)",
+      y: 40,
+      filter: "blur(12px)",
     },
     visible: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
       transition: {
-        duration: 0.8,
+        duration: 0.6,
         ease: [0.16, 1, 0.3, 1],
       },
     },
   };
 
+  const MotionComponent = motion[Component] as typeof motion.span;
+
   return (
-    <motion.span
+    <MotionComponent
       className={`inline-flex flex-wrap ${className}`}
       variants={container}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once, margin: "-80px" }}
+      animate="visible"
     >
       {words.map((word, index) => (
-        <motion.span
-          key={index}
-          variants={child}
-          className="mr-[0.25em] inline-block will-change-[filter,opacity,transform]"
-        >
-          {word}
-        </motion.span>
+        <span key={index} className="overflow-hidden mr-[0.25em]">
+          <motion.span
+            variants={child}
+            className="inline-block will-change-[filter,opacity,transform]"
+          >
+            {word}
+          </motion.span>
+        </span>
       ))}
-    </motion.span>
+    </MotionComponent>
   );
 }

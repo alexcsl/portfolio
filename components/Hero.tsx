@@ -1,16 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
 import { SITE } from "@/lib/data";
 import AnimatedText from "./AnimatedText";
 import MagneticButton from "./MagneticButton";
+import ScrollIndicator from "./ScrollIndicator";
 
 const container = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 1 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.15 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
   },
 };
 
@@ -19,7 +20,7 @@ const item = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -36,6 +37,7 @@ export default function Hero() {
           animate="visible"
           className="flex flex-col gap-8"
         >
+          {/* Availability badge */}
           <motion.div variants={item} className="flex items-center gap-3">
             <span className="relative flex h-2 w-2">
               <span className="absolute inset-0 animate-ping rounded-full bg-accent-500 opacity-75" />
@@ -46,18 +48,17 @@ export default function Hero() {
             </span>
           </motion.div>
 
-          <h1 className="h-display">
-            <AnimatedText text="Building" />
-            <br />
+          {/* Main headline with staggered reveal */}
+          <div className="h-display flex flex-col">
+            <AnimatedText text="Building" delay={0.3} />
             <span className="gradient-text">
-              <AnimatedText text="on-chain" />
+              <AnimatedText text="on-chain" delay={0.5} />
             </span>
-            <br />
-            <AnimatedText text="& intelligent" />
-            <br />
-            <AnimatedText text="experiences." />
-          </h1>
+            <AnimatedText text="& intelligent" delay={0.7} />
+            <AnimatedText text="experiences." delay={0.9} />
+          </div>
 
+          {/* Description */}
           <motion.p
             variants={item}
             className="max-w-2xl text-lg sm:text-xl leading-relaxed text-[rgb(var(--fg-muted))]"
@@ -67,6 +68,7 @@ export default function Hero() {
             applications on Base and Lisk, and AI tools for Indonesian markets.
           </motion.p>
 
+          {/* CTA Buttons */}
           <motion.div variants={item} className="flex flex-wrap gap-3 pt-2">
             <MagneticButton
               href="#projects"
@@ -84,6 +86,7 @@ export default function Hero() {
             </MagneticButton>
           </motion.div>
 
+          {/* Social links */}
           <motion.div variants={item} className="flex items-center gap-5 pt-2">
             <a
               href={SITE.github}
@@ -113,23 +116,8 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Scroll cue */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[rgb(var(--fg-muted))]">
-            Scroll
-          </span>
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          >
-            <ArrowDown className="h-4 w-4 text-[rgb(var(--fg-muted))]" />
-          </motion.div>
-        </motion.div>
+        {/* Scroll indicator - fades out on scroll */}
+        <ScrollIndicator />
       </div>
     </section>
   );
