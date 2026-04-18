@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight, Download, Github, Linkedin, Mail } from "lucide-react";
+import { ArrowUpRight, Download, Eye, Github, Linkedin, Mail } from "lucide-react";
 import SectionHeader from "./SectionHeader";
 import { SITE } from "@/lib/data";
+import { useCVModal } from "./CVModal";
 
 const LINKS = [
   { label: "Email", value: SITE.email, href: `mailto:${SITE.email}`, icon: Mail },
@@ -12,6 +13,7 @@ const LINKS = [
 ];
 
 export default function Contact() {
+  const { open: openCV } = useCVModal();
   return (
     <section id="contact" className="relative px-5 sm:px-8 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl">
@@ -51,12 +53,11 @@ export default function Contact() {
               <a href={`mailto:${SITE.email}`} className="btn-primary">
                 <Mail className="h-4 w-4" /> {SITE.email}
               </a>
-              <a
-                href={SITE.cv}
-                download
-                className="btn-ghost"
-              >
-                <Download className="h-4 w-4" /> Download CV
+              <button type="button" onClick={openCV} className="btn-ghost">
+                <Eye className="h-4 w-4" /> View CV
+              </button>
+              <a href={SITE.cv} download className="btn-ghost">
+                <Download className="h-4 w-4" /> Download
               </a>
             </div>
           </motion.div>

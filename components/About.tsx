@@ -24,7 +24,7 @@ export default function About() {
             <p className="mt-6 text-base leading-relaxed text-[rgb(var(--fg-muted))]">
               When I&apos;m not shipping smart contracts, I&apos;m mentoring 200+ students at
               BINUS as a lab assistant across Scientific Computing, Big Data, and Cloud
-              Infrastructure courses — because teaching is still the sharpest way to learn.
+              Infrastructure courses, because teaching is still the sharpest way to learn.
             </p>
           </motion.div>
 

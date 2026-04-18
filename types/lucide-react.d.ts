@@ -6,6 +6,9 @@ declare module "lucide-react" {
   export const ArrowDown: LucideIcon;
   export const ArrowUpRight: LucideIcon;
   export const Download: LucideIcon;
+  export const ExternalLink: LucideIcon;
+  export const Eye: LucideIcon;
+  export const FileText: LucideIcon;
   export const Github: LucideIcon;
   export const Linkedin: LucideIcon;
   export const Mail: LucideIcon;

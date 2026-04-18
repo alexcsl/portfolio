@@ -13,11 +13,10 @@ export const SITE = {
 
 export const ABOUT = {
   intro: "Hi, I'm Alex.",
-  body: `Computer Science student at BINUS University (GPA 3.73/4.00) shipping fullstack on-chain applications across L2 ecosystems including Base and Lisk. I'm proficient in Solidity, Foundry, and modern web frameworks, and I'm currently expanding into AI/ML with practical applications for Indonesian market intelligence.`,
+  body: `Computer Science student at BINUS University shipping fullstack on-chain applications across L2 ecosystems including Base and Lisk. I'm proficient in Solidity, Foundry, and modern web frameworks, and I'm currently expanding into AI/ML with practical applications for Indonesian market intelligence.`,
   highlights: [
     { label: "Hackathons shipped", value: "3+" },
     { label: "Students mentored", value: "200+" },
-    { label: "GPA", value: "3.73" },
   ],
 };
 
@@ -78,7 +77,7 @@ export const PROJECTS: Project[] = [
     subtitle: "Instagram clone in Go",
     description:
       "Instagram-style social application built in Go, exploring idiomatic Go patterns, media storage, and social graph modeling.",
-    tech: ["Go", "PostgreSQL"],
+    tech: ["Go", "PostgreSQL", "Redis", "MinIO", "gORM", "Docker", "Traefik"],
     tags: ["Web"],
     year: "2025",
     links: [{ label: "GitHub", href: "https://github.com/alexcsl/hoshibmatchi" }],
@@ -108,6 +107,7 @@ export const SKILLS = [
       "Onchainkit",
       "Ethers.js",
       "ERC-20 / 721 / 1155",
+      "ZK Proofs",
     ],
   },
   {
@@ -125,12 +125,19 @@ export const SKILLS = [
       "Tailwind CSS",
       "Elysia",
       "Hono.js",
+      "Vite",
+      "HTML, CSS, JS",
     ],
   },
   {
     category: "Data & DevOps",
     items: [
       "PostgreSQL",
+      "SQLite",
+      "Indexers",
+      "TensorFlow",
+      "NumPy",
+      "Pandas",
       "Supabase",
       "Drizzle ORM",
       "Docker",

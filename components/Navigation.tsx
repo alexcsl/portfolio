@@ -4,7 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import ThemeToggle from "./ThemeToggle";
-import { Menu, X } from "lucide-react";
+import { FileText, Menu, X } from "lucide-react";
+import { useCVModal } from "./CVModal";
 
 const NAV = [
   { label: "About", href: "#about" },
@@ -33,6 +34,7 @@ export default function Navigation() {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const { scrollY } = useScroll();
+  const { open: openCV } = useCVModal();
 
   useMotionValueEvent(scrollY, "change", (y) => {
     setScrolled(y > 24);
@@ -81,6 +83,14 @@ export default function Navigation() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={openCV}
+              className="hidden md:inline-flex h-10 items-center gap-2 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-4 text-xs font-medium tracking-tight text-[rgb(var(--fg))] hover:border-[rgb(var(--accent))]/50 hover:text-[rgb(var(--accent))] transition-colors"
+            >
+              <FileText className="h-3.5 w-3.5" />
+              Resume
+            </button>
             <ThemeToggle />
             <button
               type="button"
@@ -115,6 +125,17 @@ export default function Navigation() {
               {item.label}
             </Link>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              openCV();
+            }}
+            className="mt-1 flex w-full items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-[rgb(var(--accent))] hover:bg-[rgb(var(--accent)/0.08)] transition-colors"
+          >
+            <FileText className="h-4 w-4" />
+            View Resume
+          </button>
         </div>
       </motion.div>
     </motion.header>
