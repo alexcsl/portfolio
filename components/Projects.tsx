@@ -94,11 +94,13 @@ function HorizontalRail() {
     target: railRef,
     offset: ["start start", "end end"],
   });
+  // Snappier spring — the rail should feel like it's tracking the wheel,
+  // not dragging a heavy object.
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
-    mass: 0.5,
-    restDelta: 0.001,
+    stiffness: 220,
+    damping: 32,
+    mass: 0.2,
+    restDelta: 0.0005,
   });
   const x = useTransform(smooth, [0, 1], [0, -distance]);
 
@@ -106,7 +108,8 @@ function HorizontalRail() {
     <div
       ref={railRef}
       className="relative hidden md:block"
-      style={{ height: `${Math.max(1, PROJECTS.length) * 80}vh` }}
+      // ~55vh of vertical scroll per card — roughly half the previous weight.
+      style={{ height: `${Math.max(1, PROJECTS.length) * 55 + 30}vh` }}
     >
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
         <motion.div
@@ -174,10 +177,10 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ y: -6 }}
-      className="shimmer-border glass-card group relative flex w-[85vw] max-w-[360px] shrink-0 flex-col overflow-hidden rounded-2xl md:w-[360px]"
+      className="shimmer-border glass-card group relative flex h-[560px] w-[85vw] max-w-[360px] shrink-0 flex-col overflow-hidden rounded-2xl md:h-[560px] md:w-[360px]"
     >
-      {/* Preview */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden">
+      {/* Preview — fixed height so every card's preview is identical */}
+      <div className="relative h-[280px] w-full shrink-0 overflow-hidden">
         <motion.div
           style={{ scale: previewScale }}
           className="absolute inset-0 will-change-transform"
@@ -222,32 +225,32 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         </div>
       </div>
 
-      {/* Meta */}
+      {/* Meta — fixed flex region so every card looks identical */}
       <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[rgb(var(--accent))]">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[rgb(var(--accent))] line-clamp-1">
               {project.subtitle}
             </span>
-            <h3 className="mt-1.5 text-lg font-semibold leading-tight tracking-tight sm:text-xl">
+            <h3 className="mt-1.5 text-lg font-semibold leading-tight tracking-tight line-clamp-2 min-h-[2.5em] sm:text-xl">
               {project.title}
             </h3>
           </div>
           {project.team && (
             <span
               aria-label="Team project"
-              className="inline-flex h-7 items-center gap-1 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[rgb(var(--fg-muted))]"
+              className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[rgb(var(--fg-muted))]"
             >
               <Users className="h-3 w-3" /> team
             </span>
           )}
         </div>
 
-        <p className="line-clamp-3 text-[13px] leading-relaxed text-[rgb(var(--fg-muted))]">
+        <p className="line-clamp-3 min-h-[3.9em] text-[13px] leading-relaxed text-[rgb(var(--fg-muted))]">
           {project.description}
         </p>
 
-        <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
+        <div className="mt-auto flex h-[52px] flex-wrap content-start gap-1.5 overflow-hidden pt-2">
           {project.tech.slice(0, 5).map((t) => (
             <span
               key={t}
@@ -288,7 +291,7 @@ function RailOutro() {
   return (
     <a
       href="#contact"
-      className="group relative flex w-[280px] shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[rgb(var(--accent)/0.5)] bg-[rgb(var(--accent)/0.04)] px-8 text-center transition-colors hover:bg-[rgb(var(--accent)/0.08)]"
+      className="group relative flex h-[560px] w-[280px] shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[rgb(var(--accent)/0.5)] bg-[rgb(var(--accent)/0.04)] px-8 text-center transition-colors hover:bg-[rgb(var(--accent)/0.08)]"
     >
       <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
         End of rail
