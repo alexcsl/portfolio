@@ -4,88 +4,310 @@ import * as React from "react";
 import {
   motion,
   useMotionValue,
+  useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowUpRight, Users } from "lucide-react";
+import { ArrowUpRight, Github, Users } from "lucide-react";
 import SectionHeader from "./SectionHeader";
+import SectionDivider from "./SectionDivider";
+import ProjectPreview from "./ProjectPreview";
 import { PROJECTS, SKILLS, type Project } from "@/lib/data";
-
-type Filter = "All" | Project["tags"][number];
-
-const FILTERS: Filter[] = ["All", "Blockchain", "AI", "Web", "Game"];
 
 /** Flatten SKILLS into one stack list for the marquee strip. */
 const STACK = SKILLS.flatMap((g) => g.items);
 
 export default function Projects() {
-  const [filter, setFilter] = React.useState<Filter>("All");
-
-  const filtered = React.useMemo(
-    () =>
-      filter === "All"
-        ? PROJECTS
-        : PROJECTS.filter((p) => p.tags.includes(filter)),
-    [filter]
-  );
-
   return (
-    <section id="projects" className="relative px-5 sm:px-8 py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          label="Work · Stack"
-          title={
-            <>
-              Things I&apos;ve{" "}
-              <span className="text-[rgb(var(--fg-muted))]">built recently.</span>
-            </>
-          }
-          description="Hackathon deliverables, on-chain demos, and side projects — each one a chance to learn a new stack under real deadlines. The tools and languages I reach for are in the strip below."
-        />
+    <section
+      id="projects"
+      className="snap-section relative flex flex-col"
+    >
+      {/* Section divider riding the boundary with About */}
+      <SectionDivider variant="floor" />
 
-        {/* Stack marquee */}
-        <StackStrip items={STACK} />
+      {/* Intro — takes the first viewport of the section */}
+      <div className="relative min-h-screen flex flex-col justify-center px-5 sm:px-8 pt-24 sm:pt-32 pb-12">
+        <div className="mx-auto w-full max-w-6xl">
+          <SectionHeader
+            label="Work · Stack"
+            title={
+              <>
+                Things I&apos;ve{" "}
+                <span className="text-[rgb(var(--fg-muted))]">built recently.</span>
+              </>
+            }
+            description="Hackathon deliverables, on-chain demos, and side projects. Scroll down to pan through the rail — the tools and languages I reach for drift across the strip below."
+          />
 
-        {/* Filter chips */}
-        <div className="mb-8 mt-10 flex flex-wrap gap-2">
-          {FILTERS.map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`inline-flex items-center rounded-full px-4 py-2 text-xs font-medium tracking-wide transition-all ${
-                filter === f
-                  ? "bg-[rgb(var(--accent))] text-[rgb(var(--bg))] shadow-[0_4px_22px_rgb(var(--accent-glow))]"
-                  : "glass hover:border-[rgb(var(--accent)/0.4)] text-[rgb(var(--fg))]"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+          <StackStrip items={STACK} />
+
+          <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.22em] text-[rgb(var(--fg-muted))] hidden md:block">
+            ↓ scroll to move horizontally →
+          </p>
         </div>
+      </div>
 
-        {/* Cards */}
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filtered.map((project, idx) => (
-            <ProjectCard
-              key={project.title}
-              project={project}
-              index={idx}
-              absoluteIndex={PROJECTS.indexOf(project)}
-            />
-          ))}
-        </motion.div>
+      {/* ---------- DESKTOP: horizontal scroll-jack rail ---------- */}
+      <HorizontalRail />
+
+      {/* ---------- MOBILE: vertical stack fallback ---------- */}
+      <div className="md:hidden flex flex-col gap-5 px-5 pb-16">
+        {PROJECTS.map((p, i) => (
+          <ProjectCard key={p.title} project={p} index={i} />
+        ))}
       </div>
     </section>
   );
 }
 
 /* =========================================================================
-   Stack strip — horizontal infinite marquee of all techs
+   Horizontal scroll-jack rail — vertical scroll = horizontal pan
+   ========================================================================= */
+function HorizontalRail() {
+  const railRef = React.useRef<HTMLDivElement>(null);
+  const rowRef = React.useRef<HTMLDivElement>(null);
+
+  const [distance, setDistance] = React.useState(0);
+
+  React.useEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+    const calc = () => {
+      // Total distance the row must translate so its end aligns with
+      // the right edge of the viewport, with some breathing room.
+      const rowWidth = row.scrollWidth;
+      const vw = window.innerWidth;
+      setDistance(Math.max(0, rowWidth - vw + 40));
+    };
+    calc();
+    // Recalc after images/fonts settle.
+    const t = setTimeout(calc, 300);
+    window.addEventListener("resize", calc);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", calc);
+    };
+  }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: railRef,
+    offset: ["start start", "end end"],
+  });
+  const smooth = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    mass: 0.5,
+    restDelta: 0.001,
+  });
+  const x = useTransform(smooth, [0, 1], [0, -distance]);
+
+  return (
+    <div
+      ref={railRef}
+      className="relative hidden md:block"
+      style={{ height: `${Math.max(1, PROJECTS.length) * 80}vh` }}
+    >
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        <motion.div
+          ref={rowRef}
+          style={{ x }}
+          className="flex items-stretch gap-6 pl-[8vw] pr-[8vw] will-change-transform"
+        >
+          {PROJECTS.map((p, i) => (
+            <ProjectCard key={p.title} project={p} index={i} />
+          ))}
+          {/* Trailing spacer + small outro card */}
+          <RailOutro />
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   Project card — vertical, preview-first
+   ========================================================================= */
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [4.5, -4.5]), {
+    stiffness: 200,
+    damping: 22,
+  });
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-4.5, 4.5]), {
+    stiffness: 200,
+    damping: 22,
+  });
+  const previewScale = useSpring(1, { stiffness: 260, damping: 24 });
+
+  const [hovered, setHovered] = React.useState(false);
+  const idxLabel = String(index + 1).padStart(2, "0");
+
+  const primaryLink = project.links?.[0]?.href;
+  const isExternal = !!primaryLink?.startsWith("http");
+
+  const cardInner = (
+    <motion.div
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        mx.set((e.clientX - r.left) / r.width - 0.5);
+        my.set((e.clientY - r.top) / r.height - 0.5);
+      }}
+      onMouseEnter={() => {
+        setHovered(true);
+        previewScale.set(1.08);
+      }}
+      onMouseLeave={() => {
+        setHovered(false);
+        mx.set(0);
+        my.set(0);
+        previewScale.set(1);
+      }}
+      style={{ rotateX, rotateY, transformPerspective: 1400 }}
+      initial={{ opacity: 0, y: 36 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-20% 0px" }}
+      transition={{
+        duration: 0.75,
+        delay: Math.min(index * 0.05, 0.3),
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={{ y: -6 }}
+      className="shimmer-border glass-card group relative flex w-[85vw] max-w-[360px] shrink-0 flex-col overflow-hidden rounded-2xl md:w-[360px]"
+    >
+      {/* Preview */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden">
+        <motion.div
+          style={{ scale: previewScale }}
+          className="absolute inset-0 will-change-transform"
+        >
+          <ProjectPreview variant={project.preview} className="h-full w-full" />
+        </motion.div>
+
+        {/* Hover overlay — CTA */}
+        <motion.div
+          initial={false}
+          animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 12 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-none absolute inset-0 flex items-end justify-between p-5"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 40%, rgb(var(--bg) / 0.85) 100%)",
+          }}
+        >
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[rgb(var(--fg))]">
+            {primaryLink
+              ? isExternal
+                ? "Open on GitHub"
+                : "Open project"
+              : "Private build"}
+          </span>
+          {primaryLink && (
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[rgb(var(--accent))] text-[rgb(var(--bg))] shadow-[0_6px_24px_rgb(var(--accent-glow))]">
+              {isExternal ? (
+                <Github className="h-4 w-4" />
+              ) : (
+                <ArrowUpRight className="h-4 w-4" />
+              )}
+            </span>
+          )}
+        </motion.div>
+
+        {/* Index chip */}
+        <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full bg-[rgb(var(--bg)/0.65)] px-3 py-1 font-mono text-[10px] tracking-[0.2em] uppercase text-[rgb(var(--fg))] backdrop-blur">
+          <span className="text-[rgb(var(--accent))]">{idxLabel}</span>
+          <span className="h-1 w-1 rounded-full bg-[rgb(var(--fg)/0.4)]" />
+          <span>{project.year}</span>
+        </div>
+      </div>
+
+      {/* Meta */}
+      <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[rgb(var(--accent))]">
+              {project.subtitle}
+            </span>
+            <h3 className="mt-1.5 text-lg font-semibold leading-tight tracking-tight sm:text-xl">
+              {project.title}
+            </h3>
+          </div>
+          {project.team && (
+            <span
+              aria-label="Team project"
+              className="inline-flex h-7 items-center gap-1 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[rgb(var(--fg-muted))]"
+            >
+              <Users className="h-3 w-3" /> team
+            </span>
+          )}
+        </div>
+
+        <p className="line-clamp-3 text-[13px] leading-relaxed text-[rgb(var(--fg-muted))]">
+          {project.description}
+        </p>
+
+        <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
+          {project.tech.slice(0, 5).map((t) => (
+            <span
+              key={t}
+              className="rounded-md border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.02)] px-2 py-0.5 font-mono text-[10px] text-[rgb(var(--fg-muted))] transition-colors group-hover:text-[rgb(var(--fg))]"
+            >
+              {t}
+            </span>
+          ))}
+          {project.tech.length > 5 && (
+            <span className="rounded-md px-2 py-0.5 font-mono text-[10px] text-[rgb(var(--fg-muted))]">
+              +{project.tech.length - 5}
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  return primaryLink ? (
+    <a
+      href={primaryLink}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noreferrer noopener" : undefined}
+      className="block will-change-transform"
+      aria-label={`Open ${project.title}`}
+    >
+      {cardInner}
+    </a>
+  ) : (
+    cardInner
+  );
+}
+
+/* =========================================================================
+   End-of-rail outro card — a soft invitation to the contact section
+   ========================================================================= */
+function RailOutro() {
+  return (
+    <a
+      href="#contact"
+      className="group relative flex w-[280px] shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[rgb(var(--accent)/0.5)] bg-[rgb(var(--accent)/0.04)] px-8 text-center transition-colors hover:bg-[rgb(var(--accent)/0.08)]"
+    >
+      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
+        End of rail
+      </span>
+      <span className="text-xl font-semibold tracking-tight">
+        Want the one that&apos;s not public?
+      </span>
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--accent))] text-[rgb(var(--bg))] shadow-[0_6px_24px_rgb(var(--accent-glow))] transition-transform group-hover:-translate-y-1">
+        <ArrowUpRight className="h-4 w-4" />
+      </span>
+    </a>
+  );
+}
+
+/* =========================================================================
+   Stack strip — infinite horizontal marquee of all techs
    ========================================================================= */
 function StackStrip({ items }: { items: string[] }) {
-  // Duplicate the list for seamless translate(-50%) loop.
   const duped = [...items, ...items];
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -108,142 +330,6 @@ function StackStrip({ items }: { items: string[] }) {
             {skill}
           </span>
         ))}
-      </div>
-    </motion.div>
-  );
-}
-
-/* =========================================================================
-   Interactive project card — tilt, shimmer, cursor spotlight
-   ========================================================================= */
-function ProjectCard({
-  project,
-  index,
-  absoluteIndex,
-}: {
-  project: Project;
-  index: number;
-  absoluteIndex: number;
-}) {
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [7, -7]), {
-    stiffness: 180,
-    damping: 20,
-  });
-  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-7, 7]), {
-    stiffness: 180,
-    damping: 20,
-  });
-  const spotlightX = useTransform(mx, (v) => `${v * 100 + 50}%`);
-  const spotlightY = useTransform(my, (v) => `${v * 100 + 50}%`);
-
-  function handleMouse(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - rect.left) / rect.width - 0.5);
-    my.set((e.clientY - rect.top) / rect.height - 0.5);
-  }
-  function handleLeave() {
-    mx.set(0);
-    my.set(0);
-  }
-
-  const cardIndexLabel = String(absoluteIndex + 1).padStart(2, "0");
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 32, scale: 0.96 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{
-        duration: 0.75,
-        delay: index * 0.07,
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      onMouseMove={handleMouse}
-      onMouseLeave={handleLeave}
-      style={{ rotateX, rotateY, transformPerspective: 1200 }}
-      className="shimmer-border glass-card group relative flex h-full flex-col overflow-hidden p-7 sm:p-8 will-change-transform"
-      whileHover={{
-        y: -8,
-        transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] },
-      }}
-    >
-      {/* Cursor spotlight */}
-      <motion.div
-        className="pointer-events-none absolute -inset-px rounded-[inherit] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-        style={{
-          background: useTransform(
-            [spotlightX, spotlightY],
-            ([x, y]) =>
-              `radial-gradient(520px circle at ${x} ${y}, rgb(var(--accent) / 0.18), transparent 48%)`
-          ),
-        }}
-      />
-
-      <div className="relative flex h-full flex-col gap-5">
-        {/* Header row: index + subtitle */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
-                {cardIndexLabel} · {project.subtitle}
-              </span>
-              <span className="font-mono text-[10px] text-[rgb(var(--fg-muted))]">
-                {project.year}
-              </span>
-              {project.team && (
-                <span className="inline-flex items-center gap-1 text-[10px] text-[rgb(var(--fg-muted))]">
-                  <Users className="h-3 w-3" /> team
-                </span>
-              )}
-            </div>
-            <h3 className="text-xl sm:text-2xl font-semibold leading-tight tracking-tight">
-              {project.title}
-            </h3>
-          </div>
-          {project.links?.[0] && (
-            <a
-              href={project.links[0].href}
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label={`Open ${project.title}`}
-              className="shrink-0 inline-flex h-10 w-10 items-center justify-center rounded-full glass transition-all hover:-translate-y-0.5 hover:border-[rgb(var(--accent)/0.5)] hover:text-[rgb(var(--accent))]"
-            >
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:rotate-12" />
-            </a>
-          )}
-        </div>
-
-        {/* Description */}
-        <p className="text-sm sm:text-[15px] leading-relaxed text-[rgb(var(--fg-muted))]">
-          {project.description}
-        </p>
-
-        {/* Tags row */}
-        <div className="mb-2 flex flex-wrap gap-1.5">
-          {project.tags.map((t) => (
-            <span
-              key={t}
-              className="rounded-full border border-[rgb(var(--accent)/0.3)] bg-[rgb(var(--accent)/0.08)] px-2.5 py-0.5 text-[10px] font-mono uppercase tracking-[0.14em] text-[rgb(var(--accent))]"
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-
-        {/* Tech pills */}
-        <div className="mt-auto flex flex-wrap gap-1.5 pt-2">
-          {project.tech.map((t) => (
-            <span
-              key={t}
-              className="rounded-md border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.02)] px-2 py-1 font-mono text-[11px] text-[rgb(var(--fg-muted))] transition-colors group-hover:text-[rgb(var(--fg))]"
-            >
-              {t}
-            </span>
-          ))}
-        </div>
       </div>
     </motion.div>
   );

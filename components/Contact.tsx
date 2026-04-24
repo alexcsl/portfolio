@@ -15,7 +15,7 @@ const LINKS = [
 export default function Contact() {
   const { open: openCV } = useCVModal();
   return (
-    <section id="contact" className="relative px-5 sm:px-8 py-24 sm:py-32">
+    <section id="contact" className="snap-section relative flex min-h-screen flex-col justify-center px-5 sm:px-8 py-24 sm:py-32">
       <div className="mx-auto max-w-6xl">
         <SectionHeader
           label="Contact"

@@ -20,6 +20,15 @@ export const ABOUT = {
   ],
 };
 
+export type ProjectPreviewVariant =
+  | "freelancing"
+  | "gamefi"
+  | "chatbot"
+  | "desktop"
+  | "social"
+  | "workshop"
+  | "generic";
+
 export type Project = {
   title: string;
   subtitle: string;
@@ -29,6 +38,7 @@ export type Project = {
   year: string;
   team?: boolean;
   links?: { label: string; href: string }[];
+  preview: ProjectPreviewVariant;
 };
 
 export const PROJECTS: Project[] = [
@@ -41,6 +51,7 @@ export const PROJECTS: Project[] = [
     tags: ["Blockchain", "Web"],
     year: "2025",
     team: true,
+    preview: "freelancing",
   },
   {
     title: "On-Chain GameFi",
@@ -51,6 +62,7 @@ export const PROJECTS: Project[] = [
     tags: ["Blockchain", "Game"],
     year: "2025",
     team: true,
+    preview: "gamefi",
   },
   {
     title: "Hyperlocal AI Market Chatbot",
@@ -61,6 +73,7 @@ export const PROJECTS: Project[] = [
     tags: ["AI", "Web"],
     year: "2026",
     team: true,
+    preview: "chatbot",
   },
   {
     title: "RUSA Desktop Application",
@@ -71,6 +84,7 @@ export const PROJECTS: Project[] = [
     tags: ["Web"],
     year: "2025",
     links: [{ label: "GitHub", href: "https://github.com/alexcsl/RUSA-Desktop-Application" }],
+    preview: "desktop",
   },
   {
     title: "hoshibmatchi",
@@ -81,6 +95,7 @@ export const PROJECTS: Project[] = [
     tags: ["Web"],
     year: "2025",
     links: [{ label: "GitHub", href: "https://github.com/alexcsl/hoshibmatchi" }],
+    preview: "social",
   },
   {
     title: "fish-it",
@@ -92,6 +107,7 @@ export const PROJECTS: Project[] = [
     year: "2024",
     team: true,
     links: [{ label: "GitHub", href: "https://github.com/alexcsl/fish-it" }],
+    preview: "workshop",
   },
 ];
 

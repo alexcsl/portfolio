@@ -6,6 +6,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import ScrollProgress from "@/components/ScrollProgress";
 import { CVModalProvider } from "@/components/CVModal";
+import CustomCursor from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Alexander Christian · Blockchain & AI Developer",
@@ -73,6 +74,7 @@ export default function RootLayout({
           <CVModalProvider>
             <SceneBackground />
             <ScrollProgress />
+            <CustomCursor />
             <div className="relative z-10 flex min-h-screen flex-col">
               <Navigation />
               <main className="flex-1">{children}</main>
