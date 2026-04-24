@@ -77,7 +77,7 @@ export default function Contact() {
                   href={link.href}
                   target={link.href.startsWith("http") ? "_blank" : undefined}
                   rel={link.href.startsWith("http") ? "noreferrer noopener" : undefined}
-                  className="glass-card flex items-center justify-between gap-4 p-5 hover:border-accent-500/40 group"
+                  className="glass-card flex items-center justify-between gap-4 p-5 hover:border-[rgb(var(--accent)/0.4)] group"
                 >
                   <div className="flex items-center gap-4">
                     <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))]">

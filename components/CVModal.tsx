@@ -127,7 +127,7 @@ function CVModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                   href={SITE.cv}
                   download
                   aria-label="Download CV"
-                  className="inline-flex h-9 items-center gap-2 rounded-full bg-[rgb(var(--accent))] px-3 text-xs font-medium text-white shadow-[0_4px_20px_rgba(59,130,246,0.35)] hover:brightness-110 transition-all"
+                  className="inline-flex h-9 items-center gap-2 rounded-full bg-[rgb(var(--accent))] px-3 text-xs font-medium text-[rgb(var(--bg))] shadow-[0_4px_20px_rgb(var(--accent-glow))] hover:brightness-110 transition-all"
                 >
                   <Download className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">Download</span>

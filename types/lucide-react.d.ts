@@ -14,7 +14,9 @@ declare module "lucide-react" {
   export const Mail: LucideIcon;
   export const Menu: LucideIcon;
   export const Moon: LucideIcon;
+  export const Mountain: LucideIcon;
   export const Sun: LucideIcon;
   export const Users: LucideIcon;
+  export const Waves: LucideIcon;
   export const X: LucideIcon;
 }
