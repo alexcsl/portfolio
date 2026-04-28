@@ -60,6 +60,7 @@ export type ProjectVariant =
   | "desktop"
   | "social"
   | "workshop"
+  | "mobile"
   | "generic";
 
 const SCENES: Record<ProjectVariant, React.FC> = {
@@ -69,6 +70,7 @@ const SCENES: Record<ProjectVariant, React.FC> = {
   desktop: DesktopScene,
   social: SocialScene,
   workshop: WorkshopScene,
+  mobile: MobileScene,
   generic: GenericScene,
 };
 
@@ -127,7 +129,7 @@ function FreelancingScene() {
         <rect x="238" y="100" width="60" height="4" rx="2" fill="rgb(var(--fg) / 0.2)" />
       </g>
 
-      {/* connection arrows */}
+      {/* connection — static dashed path, no animation */}
       <path
         d="M180,155 Q200,130 220,135"
         fill="none"
@@ -135,15 +137,7 @@ function FreelancingScene() {
         strokeWidth="1.5"
         strokeDasharray="4 3"
         opacity="0.9"
-      >
-        <animate
-          attributeName="stroke-dashoffset"
-          from="0"
-          to="-14"
-          dur="1.2s"
-          repeatCount="indefinite"
-        />
-      </path>
+      />
 
       {/* nodes */}
       <circle cx="180" cy="155" r="5" fill="rgb(var(--accent))" />
@@ -177,7 +171,6 @@ function GameFiScene() {
       preserveAspectRatio="xMidYMid slice"
       aria-hidden
     >
-      {/* sky-ground split */}
       <rect x="0" y="0" width="400" height="200" fill="rgb(var(--accent-soft) / 0.08)" />
       <rect x="0" y="200" width="400" height="100" fill="rgb(var(--accent-deep) / 0.18)" />
       <line
@@ -190,7 +183,6 @@ function GameFiScene() {
         strokeDasharray="4 4"
       />
 
-      {/* pixel grid - center character */}
       <g transform="translate(130, 78)">
         {grid.map((row, y) =>
           row.split("").map((c, x) =>
@@ -208,14 +200,12 @@ function GameFiScene() {
         )}
       </g>
 
-      {/* coins floating */}
+      {/* coins — static, no per-frame attribute animation */}
       <g>
-        <circle cx="70" cy="90" r="10" fill="rgb(var(--accent-soft))">
-          <animate attributeName="cy" values="90;80;90" dur="3s" repeatCount="indefinite" />
-        </circle>
+        <circle cx="70" cy="85" r="10" fill="rgb(var(--accent-soft))" />
         <text
           x="70"
-          y="95"
+          y="90"
           textAnchor="middle"
           fill="rgb(var(--accent-deep))"
           fontSize="11"
@@ -224,14 +214,7 @@ function GameFiScene() {
         >
           ₿
         </text>
-        <circle cx="340" cy="140" r="8" fill="rgb(var(--accent-soft))">
-          <animate
-            attributeName="cy"
-            values="140;130;140"
-            dur="3.4s"
-            repeatCount="indefinite"
-          />
-        </circle>
+        <circle cx="340" cy="135" r="8" fill="rgb(var(--accent-soft))" opacity="0.85" />
       </g>
     </svg>
   );
@@ -281,37 +264,18 @@ function ChatbotScene() {
         <rect x="188" y="196" width="80" height="4" rx="2" fill="rgb(var(--accent))" opacity="0.4" />
       </g>
 
-      {/* sparkles (AI) */}
-      <g fill="rgb(var(--accent-soft))">
-        <path d="M335,60 l3,8 l8,3 l-8,3 l-3,8 l-3,-8 l-8,-3 l8,-3 z" opacity="0.85">
-          <animateTransform
-            attributeName="transform"
-            type="rotate"
-            from="0 335 78"
-            to="360 335 78"
-            dur="14s"
-            repeatCount="indefinite"
-          />
-        </path>
-        <circle cx="355" cy="110" r="2.5">
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="2.4s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="320" cy="140" r="1.8">
-          <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3s" repeatCount="indefinite" />
-        </circle>
+      {/* sparkle — static, no rotation */}
+      <g fill="rgb(var(--accent-soft))" opacity="0.85">
+        <path d="M335,60 l3,8 l8,3 l-8,3 l-3,8 l-3,-8 l-8,-3 l8,-3 z" />
+        <circle cx="358" cy="108" r="2" opacity="0.6" />
+        <circle cx="318" cy="138" r="1.5" opacity="0.5" />
       </g>
 
-      {/* typing dots */}
-      <g fill="rgb(var(--accent))" opacity="0.8">
-        <circle cx="65" cy="240" r="3">
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" begin="0s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="78" cy="240" r="3">
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" begin="0.2s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="91" cy="240" r="3">
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="1.2s" begin="0.4s" repeatCount="indefinite" />
-        </circle>
+      {/* typing dots — single CSS-driven animation, GPU-friendly */}
+      <g fill="rgb(var(--accent))">
+        <circle cx="65" cy="240" r="3" className="dot-pulse dot-1" />
+        <circle cx="78" cy="240" r="3" className="dot-pulse dot-2" />
+        <circle cx="91" cy="240" r="3" className="dot-pulse dot-3" />
       </g>
     </svg>
   );
@@ -361,10 +325,15 @@ function DesktopScene() {
         </text>
       </g>
 
-      {/* cursor */}
-      <rect x="180" y="195" width="8" height="12" fill="rgb(var(--accent))">
-        <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite" />
-      </rect>
+      {/* cursor — CSS blink, single composited element */}
+      <rect
+        x="180"
+        y="195"
+        width="8"
+        height="12"
+        fill="rgb(var(--accent))"
+        className="terminal-blink"
+      />
     </svg>
   );
 }
@@ -421,21 +390,14 @@ function SocialScene() {
         </g>
       </g>
 
-      {/* star motif (hoshi = star) */}
+      {/* star motif (hoshi = star) — CSS rotation, GPU-composited */}
       <g fill="rgb(var(--accent-soft))" opacity="0.9">
-        <path d="M70,90 l4,11 l11,1 l-9,8 l3,11 l-9,-6 l-9,6 l3,-11 l-9,-8 l11,-1 z">
-          <animateTransform
-            attributeName="transform"
-            type="rotate"
-            from="0 70 100"
-            to="360 70 100"
-            dur="18s"
-            repeatCount="indefinite"
-          />
-        </path>
-        <circle cx="330" cy="150" r="3">
-          <animate attributeName="opacity" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite" />
-        </circle>
+        <path
+          d="M70,90 l4,11 l11,1 l-9,8 l3,11 l-9,-6 l-9,6 l3,-11 l-9,-8 l11,-1 z"
+          className="star-spin"
+          style={{ transformOrigin: "70px 100px" }}
+        />
+        <circle cx="330" cy="150" r="3" />
       </g>
     </svg>
   );
@@ -477,20 +439,192 @@ function WorkshopScene() {
         />
       </g>
 
-      {/* bubbles */}
+      {/* bubbles — single CSS animation per bubble, two only */}
       <g fill="rgb(var(--accent-soft) / 0.8)">
-        <circle cx="240" cy="180" r="4">
-          <animate attributeName="cy" from="210" to="120" dur="4s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0;0.9;0" dur="4s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="260" cy="200" r="3">
-          <animate attributeName="cy" from="220" to="100" dur="5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0;0.9;0" dur="5s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="280" cy="190" r="2.5">
-          <animate attributeName="cy" from="215" to="110" dur="4.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0;0.9;0" dur="4.5s" repeatCount="indefinite" />
-        </circle>
+        <circle cx="240" cy="200" r="4" className="bubble-rise bubble-1" />
+        <circle cx="280" cy="200" r="3" className="bubble-rise bubble-2" />
+      </g>
+    </svg>
+  );
+}
+
+/* =====================================================================
+   7. TasKalender — Android task tracker
+   ===================================================================== */
+function MobileScene() {
+  return (
+    <svg
+      viewBox="0 0 400 300"
+      className="absolute inset-0 h-full w-full"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      {/* phone */}
+      <g transform="translate(135, 24)">
+        <rect
+          x="0"
+          y="0"
+          width="130"
+          height="252"
+          rx="20"
+          fill="rgb(var(--fg) / 0.06)"
+          stroke="rgb(var(--fg) / 0.55)"
+          strokeWidth="2"
+        />
+        {/* notch */}
+        <rect x="50" y="6" width="30" height="5" rx="2" fill="rgb(var(--fg) / 0.4)" />
+
+        {/* mini calendar header */}
+        <g transform="translate(12, 26)">
+          <text
+            x="0"
+            y="10"
+            fill="rgb(var(--accent))"
+            fontSize="9"
+            fontWeight="700"
+            fontFamily="ui-monospace, monospace"
+            letterSpacing="1"
+          >
+            APRIL
+          </text>
+          {/* week strip */}
+          {[0, 1, 2, 3, 4, 5, 6].map((d) => (
+            <text
+              key={d}
+              x={d * 15}
+              y="24"
+              fill="rgb(var(--fg) / 0.5)"
+              fontSize="7"
+              fontFamily="ui-monospace, monospace"
+            >
+              {["M", "T", "W", "T", "F", "S", "S"][d]}
+            </text>
+          ))}
+          {/* day cells */}
+          {Array.from({ length: 14 }).map((_, i) => {
+            const col = i % 7;
+            const row = Math.floor(i / 7);
+            const isToday = i === 9;
+            return (
+              <g key={i}>
+                {isToday && (
+                  <circle
+                    cx={col * 15 + 3}
+                    cy={row * 15 + 36}
+                    r="6"
+                    fill="rgb(var(--accent))"
+                  />
+                )}
+                <text
+                  x={col * 15}
+                  y={row * 15 + 39}
+                  fill={
+                    isToday ? "rgb(var(--bg))" : "rgb(var(--fg) / 0.7)"
+                  }
+                  fontSize="7"
+                  fontFamily="ui-monospace, monospace"
+                  fontWeight={isToday ? 700 : 400}
+                >
+                  {12 + i}
+                </text>
+              </g>
+            );
+          })}
+        </g>
+
+        {/* tasks list */}
+        <g transform="translate(12, 142)">
+          {[
+            { label: "Pay listrik", done: true },
+            { label: "Buy groceries", done: true },
+            { label: "Finish CS report", done: false },
+            { label: "Gym at 6pm", done: false },
+          ].map((t, i) => (
+            <g key={i} transform={`translate(0, ${i * 18})`}>
+              <rect
+                x="0"
+                y="0"
+                width="10"
+                height="10"
+                rx="2"
+                fill={t.done ? "rgb(var(--accent))" : "transparent"}
+                stroke={
+                  t.done
+                    ? "rgb(var(--accent))"
+                    : "rgb(var(--fg) / 0.45)"
+                }
+                strokeWidth="1.2"
+              />
+              {t.done && (
+                <path
+                  d="M2.5,5 L4.5,7 L8,3.5"
+                  fill="none"
+                  stroke="rgb(var(--bg))"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              )}
+              <text
+                x="16"
+                y="8"
+                fill={
+                  t.done ? "rgb(var(--fg) / 0.45)" : "rgb(var(--fg) / 0.85)"
+                }
+                fontSize="8"
+                fontFamily="ui-monospace, monospace"
+                textDecoration={t.done ? "line-through" : "none"}
+              >
+                {t.label}
+              </text>
+            </g>
+          ))}
+        </g>
+
+        {/* bottom currency strip */}
+        <g transform="translate(12, 222)">
+          <rect
+            x="0"
+            y="0"
+            width="106"
+            height="20"
+            rx="4"
+            fill="rgb(var(--accent) / 0.15)"
+            stroke="rgb(var(--accent) / 0.5)"
+            strokeWidth="1"
+          />
+          <text
+            x="6"
+            y="14"
+            fill="rgb(var(--accent))"
+            fontSize="9"
+            fontWeight="700"
+            fontFamily="ui-monospace, monospace"
+          >
+            Rp
+          </text>
+          <text
+            x="22"
+            y="14"
+            fill="rgb(var(--fg) / 0.85)"
+            fontSize="9"
+            fontFamily="ui-monospace, monospace"
+          >
+            +1.250.000
+          </text>
+        </g>
+      </g>
+
+      {/* small Firebase flame to one side */}
+      <g transform="translate(60, 100)" opacity="0.9">
+        <path
+          d="M16,0 C14,8 10,10 8,16 C6,22 8,30 16,32 C24,30 26,22 22,14 C18,8 18,4 16,0 Z"
+          fill="rgb(var(--accent))"
+        />
+        <path
+          d="M16,8 C15,12 13,14 12,18 C12,22 14,26 16,26 C18,26 20,22 18,18 C17,14 17,11 16,8 Z"
+          fill="rgb(var(--accent-soft))"
+        />
       </g>
     </svg>
   );

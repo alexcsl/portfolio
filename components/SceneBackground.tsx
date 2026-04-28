@@ -28,10 +28,11 @@ export default function SceneBackground() {
   const embersY = useTransform(smooth, [0, 1], [0, -120]);
   const glowScale = useTransform(smooth, [0, 0.5, 1], [1, 1.18, 1]);
 
-  // Deterministic particle positions so SSR/CSR don't mismatch
+  // Deterministic particle positions so SSR/CSR don't mismatch.
+  // Cut count from 44 → 22 — same visual mood, half the GPU work.
   const particles = React.useMemo(
     () =>
-      Array.from({ length: 44 }, (_, i) => ({
+      Array.from({ length: 22 }, (_, i) => ({
         left: (i * 73) % 100,
         top: (i * 37) % 100,
         size: 1 + (i % 3),
@@ -234,7 +235,7 @@ function WaveLayer({
 }) {
   return (
     <div className={`${outerClass} overflow-hidden`}>
-      <div className={`flex h-full w-[200%] will-change-transform ${animationClass}`}>
+      <div className={`flex h-full w-[200%] gpu ${animationClass}`}>
         <svg
           className="block h-full w-1/2 flex-shrink-0"
           viewBox={viewBox}

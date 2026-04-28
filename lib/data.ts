@@ -27,6 +27,7 @@ export type ProjectPreviewVariant =
   | "desktop"
   | "social"
   | "workshop"
+  | "mobile"
   | "generic";
 
 export type Project = {
@@ -82,7 +83,7 @@ export const PROJECTS: Project[] = [
       "Cross-platform desktop application built with the Rust-Tauri-Svelte stack, exploring BAD (Brutalist-Adjacent Design) principles and native OS integration.",
     tech: ["Rust", "Tauri", "Svelte", "TypeScript"],
     tags: ["Web"],
-    year: "2025",
+    year: "2026",
     links: [{ label: "GitHub", href: "https://github.com/alexcsl/RUSA-Desktop-Application" }],
     preview: "desktop",
   },
@@ -98,13 +99,23 @@ export const PROJECTS: Project[] = [
     preview: "social",
   },
   {
+    title: "TasKalender",
+    subtitle: "Android productivity app",
+    description:
+      "Native Android app combining task tracker, expense and income ledger, and quick notes. Auth, password reset, and cross-device sync via Firebase. Built in Kotlin and Java with XML layouts in Android Studio.",
+    tech: ["Kotlin", "Java", "XML", "Android Studio", "Firebase"],
+    tags: ["Web"],
+    year: "2025",
+    preview: "mobile",
+  },
+  {
     title: "fish-it",
     subtitle: "BlockDevId Workshop",
     description:
       "Collaborative Web3 project developed during the BlockDevId workshop, exploring smart contract patterns and dApp integration.",
     tech: ["TypeScript", "Solidity"],
     tags: ["Blockchain"],
-    year: "2024",
+    year: "2025",
     team: true,
     links: [{ label: "GitHub", href: "https://github.com/alexcsl/fish-it" }],
     preview: "workshop",

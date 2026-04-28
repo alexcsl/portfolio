@@ -76,7 +76,9 @@
     overflow-x: hidden;
     font-feature-settings: "ss01", "cv11";
     font-family: Inter, system-ui, -apple-system, sans-serif;
-    transition: background-color 500ms ease, color 500ms ease;
+    /* Shorter — the View Transition handles the full fade; this is the
+       graceful fallback for browsers without view-transitions. */
+    transition: background-color 300ms ease, color 300ms ease;
   }
 
   ::selection {
@@ -112,22 +114,25 @@
 @layer components {
   .glass {
     background: rgb(var(--glass));
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
     border: 1px solid rgb(var(--glass-stroke));
   }
 
   .glass-strong {
     background: rgb(var(--glass));
-    backdrop-filter: blur(32px) saturate(180%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
     border: 1px solid rgb(var(--glass-stroke));
   }
 
   .glass-card {
     background: rgb(var(--glass));
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    /* Lower blur radius — backdrop-filter is one of the most expensive
+       things you can ask the compositor to do, and 24px is overkill for
+       a card that mostly sits over a single-color region. */
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
     border: 1px solid rgb(var(--glass-stroke));
     border-radius: 1.25rem;
     box-shadow:
@@ -276,8 +281,10 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.04;
-    mix-blend-mode: overlay;
+    opacity: 0.025;
+    /* No mix-blend-mode — overlay blending of a full-screen layer is one
+       of the heavier compositor ops, and a faint texture works just as
+       well at low opacity without it. */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
@@ -294,8 +301,8 @@
   .dark .scene-earth { opacity: 1; }
 
   /* ======================================================
-     Custom cursor: core dot + ring + two lagging trail blobs.
-     Theme-reactive via --accent. Hidden on touch devices.
+     Custom cursor — performance-tuned (no mix-blend-mode,
+     no filter:blur, all transform-only animations).
      ====================================================== */
   .cursor-hidden,
   .cursor-hidden * {
@@ -309,52 +316,36 @@
     left: 0;
     pointer-events: none;
     border-radius: 9999px;
+    transform: translate3d(0, 0, 0);
     will-change: transform;
+    backface-visibility: hidden;
     transform-origin: center center;
+    contain: layout style paint;
   }
   .cursor-dot {
     width: 8px;
     height: 8px;
     margin: -4px 0 0 -4px;
     background: rgb(var(--accent));
-    box-shadow: 0 0 12px rgb(var(--accent) / 0.65);
   }
   .cursor-ring {
-    width: 36px;
-    height: 36px;
-    margin: -18px 0 0 -18px;
-    border: 1.5px solid rgb(var(--accent) / 0.75);
-    background: rgb(var(--accent) / 0.04);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
+    width: 34px;
+    height: 34px;
+    margin: -17px 0 0 -17px;
+    border: 1.5px solid rgb(var(--accent) / 0.7);
+    background: transparent;
   }
   .cursor-blob {
-    width: 64px;
-    height: 64px;
-    margin: -32px 0 0 -32px;
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
     background: radial-gradient(
       circle at 50% 50%,
-      rgb(var(--accent) / 0.28),
-      rgb(var(--accent-soft) / 0.1) 55%,
-      transparent 72%
+      rgb(var(--accent) / 0.22),
+      rgb(var(--accent) / 0.08) 55%,
+      transparent 75%
     );
-    filter: blur(8px);
-    mix-blend-mode: plus-lighter;
-  }
-  .cursor-blob-2 {
-    width: 52px;
-    height: 52px;
-    margin: -26px 0 0 -26px;
-    opacity: 0.7;
-  }
-  .cursor-blob-3 {
-    width: 40px;
-    height: 40px;
-    margin: -20px 0 0 -20px;
-    opacity: 0.45;
-  }
-  .dark .cursor-blob {
-    mix-blend-mode: screen;
+    opacity: 0.85;
   }
 
   /* Shimmering hover border (for cards / buttons) */
@@ -448,6 +439,40 @@
   50.01%, 100% { opacity: 0; }
 }
 
+/* ===== Project preview scene helpers ===== */
+@keyframes dotPulse {
+  0%, 60%, 100% { opacity: 0.3; }
+  30%          { opacity: 1; }
+}
+.dot-pulse  { animation: dotPulse 1.4s ease-in-out infinite; }
+.dot-pulse.dot-1 { animation-delay: 0s; }
+.dot-pulse.dot-2 { animation-delay: 0.2s; }
+.dot-pulse.dot-3 { animation-delay: 0.4s; }
+
+@keyframes starSpin {
+  to { transform: rotate(360deg); }
+}
+.star-spin { animation: starSpin 22s linear infinite; transform-box: fill-box; }
+
+@keyframes terminalBlink {
+  0%, 50%       { opacity: 1; }
+  50.01%, 100%  { opacity: 0; }
+}
+.terminal-blink { animation: terminalBlink 1s steps(1) infinite; }
+
+@keyframes bubbleRise {
+  0%   { transform: translateY(0);   opacity: 0; }
+  20%  { opacity: 0.9; }
+  90%  { opacity: 0.9; }
+  100% { transform: translateY(-100px); opacity: 0; }
+}
+.bubble-rise           { animation: bubbleRise 4.5s ease-in-out infinite; transform-box: fill-box; }
+.bubble-rise.bubble-1  { animation-delay: 0s; }
+.bubble-rise.bubble-2  { animation-delay: 1.6s; animation-duration: 5.2s; }
+
+/* GPU-promotion helpers */
+.gpu { transform: translateZ(0); will-change: transform; }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -459,10 +484,12 @@
   }
 }
 
-/* View Transitions API for theme toggle */
+/* View Transitions API for theme toggle — shortened so the snapshot
+   isn't on screen for almost a full second. 600ms feels alive without
+   blocking the user's next interaction. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 1200ms;
+  animation-duration: 600ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 ::view-transition-old(root) { animation-name: circle-reveal-out; }

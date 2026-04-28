@@ -4,19 +4,20 @@ import * as React from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 /**
- * Theme-reactive custom cursor.
+ * Theme-reactive custom cursor — performance-tuned.
  *
- * Core dot follows exactly (via motion values, no React state on every frame).
- * Ring + two trail blobs follow through progressively laggier springs —
- * reads as a fluid, viscous trail in Sea mode / ember in Earth mode.
+ * Architecture:
+ *   - Core dot: tracks pointer exactly via motion values (no React state per frame)
+ *   - Ring: lags through a stiff spring for fluid follow
+ *   - One soft trail blob: provides "fluidity" without piling on layers
  *
- * Cursor color = --accent, so it swaps themes automatically.
+ * No mix-blend-mode, no filter:blur on heavy layers — those punish GPU
+ * compositing when the cursor crosses backdrop-filter (glass cards, marquee
+ * pills, etc.). Trail blob uses a transparent radial gradient + opacity only.
  *
- * Interactive elements (a/button/[data-cursor='hover']) trigger a "touch"
- * state: ring grows, dot shrinks. Pointer-down triggers a squish.
+ * Cursor color = --accent so theme switching is automatic.
  *
- * Disabled entirely on touch / coarse-pointer devices and when reduced motion
- * is preferred.
+ * Disabled on touch / coarse pointer / reduced-motion.
  */
 export default function CustomCursor() {
   const [enabled, setEnabled] = React.useState(false);
@@ -28,14 +29,12 @@ export default function CustomCursor() {
   const y = useMotionValue(-100);
 
   // Ring lags very slightly — fluid, not laggy.
-  const ringX = useSpring(x, { stiffness: 420, damping: 32, mass: 0.45 });
-  const ringY = useSpring(y, { stiffness: 420, damping: 32, mass: 0.45 });
+  const ringX = useSpring(x, { stiffness: 480, damping: 32, mass: 0.4 });
+  const ringY = useSpring(y, { stiffness: 480, damping: 32, mass: 0.4 });
 
-  // Trail blobs lag more for a rippling tail.
-  const trail1X = useSpring(x, { stiffness: 220, damping: 26, mass: 0.7 });
-  const trail1Y = useSpring(y, { stiffness: 220, damping: 26, mass: 0.7 });
-  const trail2X = useSpring(x, { stiffness: 130, damping: 22, mass: 1 });
-  const trail2Y = useSpring(y, { stiffness: 130, damping: 22, mass: 1 });
+  // Single soft trail blob.
+  const trailX = useSpring(x, { stiffness: 240, damping: 26, mass: 0.7 });
+  const trailY = useSpring(y, { stiffness: 240, damping: 26, mass: 0.7 });
 
   React.useEffect(() => {
     const hoverCapable = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -55,10 +54,14 @@ export default function CustomCursor() {
 
     document.body.classList.add("cursor-hidden");
 
+    let firstMove = true;
     const onMove = (e: PointerEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
-      if (!visible) setVisible(true);
+      if (firstMove) {
+        firstMove = false;
+        setVisible(true);
+      }
     };
     const onEnter = () => setVisible(true);
     const onLeave = () => setVisible(false);
@@ -95,8 +98,6 @@ export default function CustomCursor() {
       document.removeEventListener("mouseover", onOver);
       document.removeEventListener("mouseout", onOut);
     };
-    // visible intentionally excluded — we gate inside onMove
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, x, y]);
 
   if (!enabled) return null;
@@ -107,42 +108,26 @@ export default function CustomCursor() {
       aria-hidden
       style={{ opacity: visible ? 1 : 0, transition: "opacity 180ms ease" }}
     >
-      {/* Lagging trail blob — the widest, softest wash */}
+      {/* Soft trail blob */}
       <motion.div
-        className="cursor-blob cursor-blob-3"
-        style={{ x: trail2X, y: trail2Y }}
-        animate={{
-          scale: active ? 1.8 : pressed ? 0.6 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 260, damping: 22 }}
-      />
-      {/* Mid trail blob */}
-      <motion.div
-        className="cursor-blob cursor-blob-2"
-        style={{ x: trail1X, y: trail1Y }}
-        animate={{
-          scale: active ? 1.6 : pressed ? 0.7 : 1,
-        }}
+        className="cursor-blob"
+        style={{ x: trailX, y: trailY }}
+        animate={{ scale: active ? 1.5 : pressed ? 0.7 : 1 }}
         transition={{ type: "spring", stiffness: 320, damping: 24 }}
       />
       {/* Outer ring */}
       <motion.div
         className="cursor-ring"
         style={{ x: ringX, y: ringY }}
-        animate={{
-          scale: active ? 2.2 : pressed ? 0.65 : 1,
-          borderWidth: active ? 1 : 1.5,
-        }}
-        transition={{ type: "spring", stiffness: 420, damping: 28 }}
+        animate={{ scale: active ? 2.0 : pressed ? 0.7 : 1 }}
+        transition={{ type: "spring", stiffness: 460, damping: 28 }}
       />
       {/* Core dot — tracks exactly */}
       <motion.div
         className="cursor-dot"
         style={{ x, y }}
-        animate={{
-          scale: active ? 0.2 : pressed ? 1.5 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 520, damping: 28 }}
+        animate={{ scale: active ? 0.25 : pressed ? 1.5 : 1 }}
+        transition={{ type: "spring", stiffness: 540, damping: 28 }}
       />
     </div>
   );

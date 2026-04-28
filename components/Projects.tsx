@@ -115,7 +115,7 @@ function HorizontalRail() {
         <motion.div
           ref={rowRef}
           style={{ x }}
-          className="flex items-stretch gap-6 pl-[8vw] pr-[8vw] will-change-transform"
+          className="flex items-stretch gap-6 pl-[8vw] pr-[8vw] gpu"
         >
           {PROJECTS.map((p, i) => (
             <ProjectCard key={p.title} project={p} index={i} />
@@ -320,11 +320,11 @@ function StackStrip({ items }: { items: string[] }) {
       className="relative mt-6 overflow-hidden strip-mask"
       aria-label="Tech stack I work with"
     >
-      <div className="flex w-[200%] animate-marquee gap-3">
+      <div className="flex w-[200%] animate-marquee gap-3 gpu">
         {duped.map((skill, i) => (
           <span
             key={`${skill}-${i}`}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-4 py-2 font-mono text-[11px] tracking-wide text-[rgb(var(--fg))] backdrop-blur-md"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-4 py-2 font-mono text-[11px] tracking-wide text-[rgb(var(--fg))]"
           >
             <span
               aria-hidden
