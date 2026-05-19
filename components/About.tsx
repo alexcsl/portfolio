@@ -48,19 +48,33 @@ export default function About() {
             <span className="br-tr" />
             <span className="br-bl" />
             <span className="br-br" />
+            {/* Fallback initials behind the photo */}
             <div
               className="absolute inset-0 grid place-items-center font-serif text-7xl uppercase italic text-[rgb(var(--fg)/0.18)]"
               aria-hidden
             >
               AC
             </div>
-            <div className="absolute top-2 left-2 mono-label text-[9px]">
+            {/* Photo (drop file at public/me.jpg) */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/me.jpeg"
+              alt={SITE.name}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ filter: "grayscale(40%) contrast(1.05)" }}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+            {/* HUD overlay on top of photo */}
+            <div className="absolute inset-0 pointer-events-none mix-blend-screen opacity-[0.18] [background:linear-gradient(rgb(255,42,42)_50%,transparent_50%)] bg-[length:100%_3px]" />
+            <div className="absolute top-2 left-2 mono-label text-[9px] z-10">
               REC · ACTIVE
             </div>
-            <div className="absolute bottom-2 left-2 mono-dim text-[9px]">
+            <div className="absolute bottom-2 left-2 mono-dim text-[9px] z-10">
               ISO_FACE_ID: 99.9%
             </div>
-            <div className="absolute bottom-2 right-2 mono-label text-[9px]">
+            <div className="absolute bottom-2 right-2 mono-label text-[9px] z-10 text-[rgb(var(--gold))]">
               Indonesia
             </div>
             <div className="scanner-line" aria-hidden />
@@ -97,20 +111,20 @@ export default function About() {
         {/* ===== Main column. Clean Killian-style flow. ===== */}
         <div>
           <div className="mono-label mb-3 flex items-center gap-3">
-            <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+            <span className="rule-rg" />
             Competence Analysis Report
           </div>
 
-          <p className="font-serif text-2xl md:text-[2rem] leading-[1.25] text-[rgb(var(--fg)/0.95)] max-w-[44ch]">
-            Hybrid developer obsessed with{" "}
-            <span className="text-redact">technical rigor</span> and{" "}
-            <span className="text-redact">product impact</span>.
+          <p className="font-serif text-2xl md:text-[2rem] leading-[1.25] text-[rgb(var(--fg)/0.95)] max-w-[46ch]">
+            Smart contract developer fusing{" "}
+            <span className="text-redact">on-chain rigor</span> with a{" "}
+            <span className="text-mint">business mindset</span>.
           </p>
 
           {/* Education */}
           <div className="mt-14">
             <div className="mono-label mb-5 flex items-center gap-3">
-              <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+              <span className="rule-rg" />
               Academic Log [Education]
             </div>
             <ul className="space-y-4">
@@ -134,7 +148,7 @@ export default function About() {
           {/* Experience */}
           <div className="mt-14">
             <div className="mono-label mb-5 flex items-center gap-3">
-              <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+              <span className="rule-rg" />
               Field Operations [Experience]
             </div>
             <ul className="space-y-5">
@@ -163,10 +177,14 @@ export default function About() {
           <div className="mt-5">
             <div className="mono-dim mb-3">Hard Skills</div>
             <div className="flex flex-wrap gap-2">
-              {SKILLS_FLAT.map((s) => (
+              {SKILLS_FLAT.map((s, i) => (
                 <span
                   key={s}
-                  className="font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition-colors cursor-default whitespace-nowrap"
+                  className={`font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border whitespace-nowrap transition-colors cursor-default ${
+                    i % 2 === 0
+                      ? "border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))]"
+                      : "border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--gold))] hover:text-[rgb(var(--gold))]"
+                  }`}
                 >
                   {s}
                 </span>
@@ -177,10 +195,14 @@ export default function About() {
           <div className="mt-7">
             <div className="mono-dim mb-3">Soft Skills</div>
             <div className="flex flex-wrap gap-2">
-              {SOFT_SKILLS.map((s) => (
+              {SOFT_SKILLS.map((s, i) => (
                 <span
                   key={s}
-                  className="font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border border-[rgb(var(--accent)/0.4)] text-[rgb(var(--accent))] whitespace-nowrap"
+                  className={`font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border whitespace-nowrap ${
+                    i % 2 === 0
+                      ? "border-[rgb(var(--accent)/0.4)] text-[rgb(var(--accent))]"
+                      : "border-[rgb(var(--gold)/0.45)] text-[rgb(var(--gold))]"
+                  }`}
                 >
                   {s}
                 </span>
@@ -257,9 +279,41 @@ function BlockchainSpin() {
           strokeDasharray="2 3"
         />
 
-        {/* Five identical block groups, each in its own animation phase */}
+        {/* Five identical block groups + chain links above each block */}
         {hashes.map((hash, i) => (
           <g key={i} className={`bc-block b${i + 1}`}>
+            {/* Chain links: 3 alternating ovals filling the gap above this block.
+                Travel with the block as it animates downward. */}
+            <g className="bc-chain">
+              <ellipse
+                cx="0"
+                cy={-th - 19}
+                rx="5"
+                ry="2.6"
+                fill="none"
+                stroke="url(#bc-edge)"
+                strokeWidth="1.3"
+              />
+              <ellipse
+                cx="0"
+                cy={-th - 12}
+                rx="2.6"
+                ry="5"
+                fill="none"
+                stroke="url(#bc-edge)"
+                strokeWidth="1.3"
+              />
+              <ellipse
+                cx="0"
+                cy={-th - 5}
+                rx="5"
+                ry="2.6"
+                fill="none"
+                stroke="url(#bc-edge)"
+                strokeWidth="1.3"
+              />
+            </g>
+
             <polygon
               points={flPts}
               fill="url(#bc-left)"

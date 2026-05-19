@@ -44,8 +44,9 @@ export default function Projects() {
       <header className="flex items-end justify-between flex-wrap gap-6 mb-12">
         <div>
           <div className="mono-label mb-3 flex items-center gap-3">
-            <span className="inline-block w-8 h-px bg-[rgb(var(--accent))]" />
-            Selected Work
+            <span className="rule-rg" />
+            <span className="gold-word">Deployments</span>
+            <span className="text-[rgb(var(--fg)/0.4)]">/ Mainnet</span>
           </div>
           <h2 className="h-section uppercase">Projects</h2>
         </div>
@@ -97,8 +98,8 @@ function ViewToggle({
           onClick={() => setView(m)}
           className={`px-4 py-2 transition-colors ${
             view === m
-              ? "bg-[rgb(var(--accent))] text-black"
-              : "text-[rgb(var(--fg)/0.6)] hover:text-[rgb(var(--accent))]"
+              ? "bg-[rgb(var(--gold))] text-black"
+              : "text-[rgb(var(--fg)/0.6)] hover:text-[rgb(var(--gold))]"
           }`}
         >
           {m}
@@ -562,7 +563,7 @@ function Viewer({
 
             <div className="mt-12">
               <div className="mono-label mb-3 flex items-center gap-3">
-                <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+                <span className="rule-rg" />
                 Brief
               </div>
               <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">
@@ -573,7 +574,7 @@ function Viewer({
             {project.intervention && (
               <div className="mt-10">
                 <div className="mono-label mb-3 flex items-center gap-3">
-                  <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+                  <span className="rule-rg" />
                   My Role
                 </div>
                 <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">
@@ -591,7 +592,7 @@ function Viewer({
         {/* Gallery */}
         <aside className="hidden lg:block border-l border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
           <div className="mono-label mb-5 flex items-center gap-3">
-            <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+            <span className="rule-rg" />
             Gallery
           </div>
 

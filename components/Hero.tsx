@@ -102,13 +102,25 @@ export default function Hero() {
       id="hero"
       className="relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center px-6 md:px-16"
     >
+      {/* Faint hex/binary stream as ambient noise — blockchain/AI aesthetic */}
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none select-none font-mono text-[10px] leading-loose text-[rgb(var(--fg)/0.04)] p-8 overflow-hidden"
+        className="absolute inset-0 pointer-events-none select-none font-mono text-[10px] leading-loose p-8 overflow-hidden"
       >
-        {Array.from({ length: 6 }).map((_, i) => (
-          <p key={i} className="whitespace-nowrap">
-            // CLASSIFIED // CLASSIFIED // CLASSIFIED // CLASSIFIED // CLASSIFIED // CLASSIFIED //
+        {Array.from({ length: 10 }).map((_, i) => (
+          <p
+            key={i}
+            className="whitespace-nowrap"
+            style={{
+              color:
+                i % 3 === 0
+                  ? "rgb(var(--gold) / 0.05)"
+                  : "rgb(var(--fg) / 0.04)",
+            }}
+          >
+            0x{(i * 0xa3f1 + 0x4b92).toString(16).toUpperCase().padStart(8, "0")} ·
+            01101001 11000010 · TX_HASH 0x9{i}EE2D{(i * 17) % 256} · BLOCK#{18293120 + i * 11} ·
+            NODE_OK · 0x{(i * 0xb1c7).toString(16).toUpperCase().padStart(6, "0")} ·
           </p>
         ))}
       </div>
@@ -169,7 +181,16 @@ export default function Hero() {
           className="h-display uppercase"
         >
           <span className="block">Alexander</span>
-          <span className="block italic h-italic text-[rgb(var(--fg)/0.7)] -mt-2">
+          <span
+            className="block italic h-italic -mt-2"
+            style={{
+              background:
+                "linear-gradient(120deg, rgb(var(--gold-soft)) 0%, rgb(var(--gold)) 50%, rgb(var(--gold-deep)) 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
             Christian
           </span>
         </motion.h1>
@@ -184,10 +205,10 @@ export default function Hero() {
             <span className="accent-word">Fullstack</span> Developer.
           </p>
           <p>
-            <span className="accent-word">Backend</span> Rigor &{" "}
-            <span className="accent-word">Frontend</span> Interactivity.
+            <span className="accent-word">Smart Contract</span> Developer with{" "}
+            <span className="gold-word">Business</span> Mindset.
           </p>
-          <p>Seeking graduation opportunities.</p>
+          <p>Seeking Opportunities.</p>
         </motion.div>
       </div>
 
