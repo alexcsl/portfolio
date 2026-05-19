@@ -15,29 +15,24 @@ export default function Contact() {
       {/* Marquee behind */}
       <div
         aria-hidden
-        className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.06] overflow-hidden"
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.07] overflow-hidden"
       >
         <div className="marquee font-serif italic text-[10rem] leading-none whitespace-nowrap text-[rgb(var(--fg))]">
           {Array.from({ length: 2 }).map((_, i) => (
             <span key={i}>
-              Initiate Protocol · Start Transmission · Channel Open ·
+              Build something that matters · Ship it on-chain · Make it count ·
             </span>
           ))}
         </div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
-        <div className="mono-label mb-6 flex items-center justify-center gap-3">
-          <span className="pulse-dot" />
-          Channel Open · Awaiting Transmission
-        </div>
-
         <h2 className="font-serif text-[clamp(2.5rem,8vw,7rem)] leading-[0.95] tracking-tight">
           <span className="italic font-normal text-[rgb(var(--fg)/0.85)]">
-            What if we
+            Ready to
           </span>
           <br />
-          <span className="uppercase">worked together?</span>
+          <span className="uppercase">Build Something?</span>
         </h2>
 
         <div className="mt-12 flex justify-center">
@@ -81,13 +76,6 @@ export default function Contact() {
           </a>
         </div>
 
-        <div className="mt-20 mono-dim flex items-center justify-center gap-4 flex-wrap">
-          <span>Secure Line Established</span>
-          <span className="text-[rgb(var(--fg)/0.2)]">·</span>
-          <span>© {new Date().getFullYear()} {SITE.fullName}</span>
-          <span className="text-[rgb(var(--fg)/0.2)]">·</span>
-          <span>End of Transmission</span>
-        </div>
       </div>
     </section>
   );
