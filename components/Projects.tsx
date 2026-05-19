@@ -1,339 +1,639 @@
 "use client";
 
 import * as React from "react";
-import {
-  motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
-import { ArrowUpRight, Github, Users } from "lucide-react";
-import SectionHeader from "./SectionHeader";
-import SectionDivider from "./SectionDivider";
-import ProjectPreview from "./ProjectPreview";
-import { PROJECTS, SKILLS, type Project } from "@/lib/data";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, ExternalLink, Github, X } from "lucide-react";
+import { PROJECTS, type Project } from "@/lib/data";
 
-/** Flatten SKILLS into one stack list for the marquee strip. */
-const STACK = SKILLS.flatMap((g) => g.items);
+type ViewMode = "slider" | "list";
+type Origin = { x: number; y: number };
 
 export default function Projects() {
+  const [view, setView] = React.useState<ViewMode>("slider");
+  const [active, setActive] = React.useState<number | null>(null);
+  const [origin, setOrigin] = React.useState<Origin | null>(null);
+
+  const open = (i: number, fromEl?: HTMLElement | null) => {
+    if (fromEl) {
+      const r = fromEl.getBoundingClientRect();
+      setOrigin({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+    } else {
+      setOrigin(null);
+    }
+    setActive(i);
+  };
+  const close = () => setActive(null);
+  const next = () =>
+    setActive((i) => (i === null ? 0 : (i + 1) % PROJECTS.length));
+  const prev = () =>
+    setActive((i) =>
+      i === null ? 0 : (i - 1 + PROJECTS.length) % PROJECTS.length,
+    );
+
+  React.useEffect(() => {
+    if (active !== null) document.body.classList.add("viewer-open");
+    else document.body.classList.remove("viewer-open");
+    return () => document.body.classList.remove("viewer-open");
+  }, [active]);
+
   return (
     <section
       id="projects"
-      className="snap-section relative flex flex-col"
+      className="relative w-full px-6 md:px-16 py-32 border-t border-[rgb(var(--fg)/0.06)]"
     >
-      {/* Section divider riding the boundary with About */}
-      <SectionDivider variant="floor" />
-
-      {/* Intro — takes the first viewport of the section */}
-      <div className="relative min-h-screen flex flex-col justify-center px-5 sm:px-8 pt-24 sm:pt-32 pb-12">
-        <div className="mx-auto w-full max-w-6xl">
-          <SectionHeader
-            label="Work · Stack"
-            title={
-              <>
-                Things I&apos;ve{" "}
-                <span className="text-[rgb(var(--fg-muted))]">built recently.</span>
-              </>
-            }
-            description="Hackathon deliverables, on-chain demos, and side projects. Scroll down to pan through the rail — the tools and languages I reach for drift across the strip below."
-          />
-
-          <StackStrip items={STACK} />
-
-          <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.22em] text-[rgb(var(--fg-muted))] hidden md:block">
-            ↓ scroll to move horizontally →
-          </p>
+      <header className="flex items-end justify-between flex-wrap gap-6 mb-12">
+        <div>
+          <div className="mono-label mb-3 flex items-center gap-3">
+            <span className="inline-block w-8 h-px bg-[rgb(var(--accent))]" />
+            Selected Work
+          </div>
+          <h2 className="h-section uppercase">Projects</h2>
         </div>
-      </div>
 
-      {/* ---------- DESKTOP: horizontal scroll-jack rail ---------- */}
-      <HorizontalRail />
+        <div className="flex items-center gap-3">
+          <div className="mono-dim mr-2">
+            {String(PROJECTS.length).padStart(2, "0")} files
+          </div>
+          <ViewToggle view={view} setView={setView} />
+        </div>
+      </header>
 
-      {/* ---------- MOBILE: vertical stack fallback ---------- */}
-      <div className="md:hidden flex flex-col gap-5 px-5 pb-16">
-        {PROJECTS.map((p, i) => (
-          <ProjectCard key={p.title} project={p} index={i} />
-        ))}
-      </div>
+      {view === "slider" ? (
+        <TileRail onOpen={open} />
+      ) : (
+        <ListView onOpen={open} />
+      )}
+      {/* `open` accepts (index, fromEl) so the viewer scales from the clicked tile/row */}
+
+      <AnimatePresence>
+        {active !== null && (
+          <Viewer
+            project={PROJECTS[active]}
+            index={active}
+            total={PROJECTS.length}
+            origin={origin}
+            onClose={close}
+            onNext={next}
+            onPrev={prev}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
 
-/* =========================================================================
-   Horizontal scroll-jack rail — vertical scroll = horizontal pan
-   ========================================================================= */
-function HorizontalRail() {
-  const railRef = React.useRef<HTMLDivElement>(null);
-  const rowRef = React.useRef<HTMLDivElement>(null);
+function ViewToggle({
+  view,
+  setView,
+}: {
+  view: ViewMode;
+  setView: (v: ViewMode) => void;
+}) {
+  return (
+    <div className="inline-flex border border-[rgb(var(--fg)/0.12)] font-mono text-[10px] tracking-[0.18em] uppercase">
+      {(["slider", "list"] as const).map((m) => (
+        <button
+          key={m}
+          onClick={() => setView(m)}
+          className={`px-4 py-2 transition-colors ${
+            view === m
+              ? "bg-[rgb(var(--accent))] text-black"
+              : "text-[rgb(var(--fg)/0.6)] hover:text-[rgb(var(--accent))]"
+          }`}
+        >
+          {m}
+        </button>
+      ))}
+    </div>
+  );
+}
 
-  const [distance, setDistance] = React.useState(0);
-
-  React.useEffect(() => {
-    const row = rowRef.current;
-    if (!row) return;
-    const calc = () => {
-      // Total distance the row must translate so its end aligns with
-      // the right edge of the viewport, with some breathing room.
-      const rowWidth = row.scrollWidth;
-      const vw = window.innerWidth;
-      setDistance(Math.max(0, rowWidth - vw + 40));
-    };
-    calc();
-    // Recalc after images/fonts settle.
-    const t = setTimeout(calc, 300);
-    window.addEventListener("resize", calc);
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("resize", calc);
-    };
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: railRef,
-    offset: ["start start", "end end"],
+/* ---------- Tile rail (slider) ---------- */
+function TileRail({
+  onOpen,
+}: {
+  onOpen: (i: number, fromEl?: HTMLElement | null) => void;
+}) {
+  const railRef = React.useRef<HTMLDivElement | null>(null);
+  const state = React.useRef({
+    down: false,
+    startX: 0,
+    startScroll: 0,
+    moved: 0,
+    downIndex: -1,
+    downEl: null as HTMLElement | null,
   });
-  // Snappier spring — the rail should feel like it's tracking the wheel,
-  // not dragging a heavy object.
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 220,
-    damping: 32,
-    mass: 0.2,
-    restDelta: 0.0005,
-  });
-  const x = useTransform(smooth, [0, 1], [0, -distance]);
+  const [dragging, setDragging] = React.useState(false);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    const el = railRef.current;
+    if (!el) return;
+    const target = (e.target as HTMLElement).closest(
+      "[data-tile-index]",
+    ) as HTMLElement | null;
+    const idx = target
+      ? Number(target.getAttribute("data-tile-index"))
+      : -1;
+    state.current = {
+      down: true,
+      startX: e.clientX,
+      startScroll: el.scrollLeft,
+      moved: 0,
+      downIndex: idx,
+      downEl: target,
+    };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const st = state.current;
+    const el = railRef.current;
+    if (!st.down || !el) return;
+    const dx = e.clientX - st.startX;
+    st.moved = Math.abs(dx);
+    if (st.moved > 6 && !dragging) setDragging(true);
+    el.scrollLeft = st.startScroll - dx;
+  };
+  const onPointerUp = () => {
+    const st = state.current;
+    if (st.down && st.moved < 8 && st.downIndex >= 0) {
+      onOpen(st.downIndex, st.downEl);
+    }
+    st.down = false;
+    setTimeout(() => setDragging(false), 0);
+  };
+
+  const scrollByAmount = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(320, el.clientWidth * 0.6), behavior: "smooth" });
+  };
 
   return (
-    <div
-      ref={railRef}
-      className="relative hidden md:block"
-      // ~55vh of vertical scroll per card — roughly half the previous weight.
-      style={{ height: `${Math.max(1, PROJECTS.length) * 55 + 30}vh` }}
-    >
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-        <motion.div
-          ref={rowRef}
-          style={{ x }}
-          className="flex items-stretch gap-6 pl-[8vw] pr-[8vw] gpu"
-        >
-          {PROJECTS.map((p, i) => (
-            <ProjectCard key={p.title} project={p} index={i} />
-          ))}
-          {/* Trailing spacer + small outro card */}
-          <RailOutro />
-        </motion.div>
+    <div className="relative">
+      <button
+        type="button"
+        aria-label="Previous"
+        onClick={() => scrollByAmount(-1)}
+        className="hidden sm:grid place-items-center absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-20 w-11 h-11 border border-[rgb(var(--fg)/0.15)] bg-black/70 backdrop-blur hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        aria-label="Next"
+        onClick={() => scrollByAmount(1)}
+        className="hidden sm:grid place-items-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-20 w-11 h-11 border border-[rgb(var(--fg)/0.15)] bg-black/70 backdrop-blur hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+      >
+        <ChevronRight className="w-4 h-4" />
+      </button>
+
+      <div
+        ref={railRef}
+        className={`tile-rail overflow-x-auto pb-6 -mx-1 px-1 ${dragging ? "dragging" : ""}`}
+        style={{ scrollbarWidth: "none" }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        onPointerLeave={onPointerUp}
+      >
+        {PROJECTS.map((p, i) => (
+          <Tile key={p.evidence} project={p} index={i} />
+        ))}
       </div>
     </div>
   );
 }
 
-/* =========================================================================
-   Project card — vertical, preview-first
-   ========================================================================= */
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [4.5, -4.5]), {
-    stiffness: 200,
-    damping: 22,
-  });
-  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-4.5, 4.5]), {
-    stiffness: 200,
-    damping: 22,
-  });
-  const previewScale = useSpring(1, { stiffness: 260, damping: 24 });
+function Tile({ project, index }: { project: Project; index: number }) {
+  return (
+    <div data-tile-index={index} data-cursor="hover" className="tile">
+      <span className="tile-corner c-tl" />
+      <span className="tile-corner c-tr" />
+      <span className="tile-corner c-bl" />
+      <span className="tile-corner c-br" />
 
-  const [hovered, setHovered] = React.useState(false);
-  const idxLabel = String(index + 1).padStart(2, "0");
+      <TileVisual project={project} />
 
-  const primaryLink = project.links?.[0]?.href;
-  const isExternal = !!primaryLink?.startsWith("http");
+      <div className="tile-content">
+        <div className="flex items-start justify-between">
+          <span className="tile-num">#{project.evidence}</span>
+          <span className="tile-meta">{project.year}</span>
+        </div>
 
-  const cardInner = (
-    <motion.div
-      onMouseMove={(e) => {
-        const r = e.currentTarget.getBoundingClientRect();
-        mx.set((e.clientX - r.left) / r.width - 0.5);
-        my.set((e.clientY - r.top) / r.height - 0.5);
+        <div>
+          <div className="tile-meta mb-2 opacity-80">{project.type}</div>
+          <h3 className="tile-title">{project.title}</h3>
+          <div className="mt-3 flex flex-wrap gap-1.5 max-w-full">
+            {project.tech.slice(0, 3).map((t) => (
+              <span
+                key={t}
+                className="font-mono text-[9px] uppercase tracking-[0.14em] px-1.5 py-0.5 border border-[rgb(var(--fg)/0.25)] text-[rgb(var(--fg)/0.85)] bg-black/30"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TileVisual({
+  project,
+  showNumeral = true,
+}: {
+  project: Project;
+  showNumeral?: boolean;
+}) {
+  const hue = hueFor(project.preview);
+
+  if (project.image) {
+    return (
+      <div
+        className="tile-visual"
+        aria-hidden
+        style={{
+          backgroundImage: `url("${project.image}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="tile-visual"
+      aria-hidden
+      style={{
+        background: `
+          radial-gradient(120% 70% at 80% 20%, hsl(${hue} 70% 28% / 0.95), transparent 60%),
+          radial-gradient(120% 70% at 10% 90%, hsl(${(hue + 50) % 360} 55% 18% / 0.95), transparent 65%),
+          linear-gradient(160deg, hsl(${hue} 45% 12%) 0%, hsl(${hue} 30% 6%) 60%, #060606 100%)
+        `,
       }}
-      onMouseEnter={() => {
-        setHovered(true);
-        previewScale.set(1.08);
-      }}
-      onMouseLeave={() => {
-        setHovered(false);
-        mx.set(0);
-        my.set(0);
-        previewScale.set(1);
-      }}
-      style={{ rotateX, rotateY, transformPerspective: 1400 }}
-      initial={{ opacity: 0, y: 36 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-20% 0px" }}
-      transition={{
-        duration: 0.75,
-        delay: Math.min(index * 0.05, 0.3),
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      whileHover={{ y: -6 }}
-      className="shimmer-border glass-card group relative flex h-[560px] w-[85vw] max-w-[360px] shrink-0 flex-col overflow-hidden rounded-2xl md:h-[560px] md:w-[360px]"
     >
-      {/* Preview — fixed height so every card's preview is identical */}
-      <div className="relative h-[280px] w-full shrink-0 overflow-hidden">
-        <motion.div
-          style={{ scale: previewScale }}
-          className="absolute inset-0 will-change-transform"
-        >
-          <ProjectPreview variant={project.preview} className="h-full w-full" />
-        </motion.div>
+      <svg
+        className="absolute inset-0 w-full h-full opacity-[0.18]"
+        viewBox="0 0 200 200"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden
+      >
+        <defs>
+          <pattern id={`g-${project.evidence}`} width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.3" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill={`url(#g-${project.evidence})`} />
+      </svg>
 
-        {/* Hover overlay — CTA */}
-        <motion.div
-          initial={false}
-          animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 12 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="pointer-events-none absolute inset-0 flex items-end justify-between p-5"
+      {showNumeral && (
+        <div
+          aria-hidden
+          className="absolute inset-0 grid place-items-center"
           style={{
-            background:
-              "linear-gradient(180deg, transparent 40%, rgb(var(--bg) / 0.85) 100%)",
+            fontFamily: "Playfair Display, serif",
+            fontStyle: "italic",
+            fontWeight: 700,
+            fontSize: "clamp(8rem, 18vw, 14rem)",
+            color: "rgb(255 255 255 / 0.08)",
+            lineHeight: 1,
+            letterSpacing: "-0.04em",
           }}
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[rgb(var(--fg))]">
-            {primaryLink
-              ? isExternal
-                ? "Open on GitHub"
-                : "Open project"
-              : "Private build"}
-          </span>
-          {primaryLink && (
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[rgb(var(--accent))] text-[rgb(var(--bg))] shadow-[0_6px_24px_rgb(var(--accent-glow))]">
-              {isExternal ? (
-                <Github className="h-4 w-4" />
-              ) : (
-                <ArrowUpRight className="h-4 w-4" />
-              )}
-            </span>
-          )}
-        </motion.div>
-
-        {/* Index chip */}
-        <div className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full bg-[rgb(var(--bg)/0.65)] px-3 py-1 font-mono text-[10px] tracking-[0.2em] uppercase text-[rgb(var(--fg))] backdrop-blur">
-          <span className="text-[rgb(var(--accent))]">{idxLabel}</span>
-          <span className="h-1 w-1 rounded-full bg-[rgb(var(--fg)/0.4)]" />
-          <span>{project.year}</span>
+          {project.evidence}
         </div>
-      </div>
-
-      {/* Meta — fixed flex region so every card looks identical */}
-      <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[rgb(var(--accent))] line-clamp-1">
-              {project.subtitle}
-            </span>
-            <h3 className="mt-1.5 text-lg font-semibold leading-tight tracking-tight line-clamp-2 min-h-[2.5em] sm:text-xl">
-              {project.title}
-            </h3>
-          </div>
-          {project.team && (
-            <span
-              aria-label="Team project"
-              className="inline-flex h-7 shrink-0 items-center gap-1 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[rgb(var(--fg-muted))]"
-            >
-              <Users className="h-3 w-3" /> team
-            </span>
-          )}
-        </div>
-
-        <p className="line-clamp-3 min-h-[3.9em] text-[13px] leading-relaxed text-[rgb(var(--fg-muted))]">
-          {project.description}
-        </p>
-
-        <div className="mt-auto flex h-[52px] flex-wrap content-start gap-1.5 overflow-hidden pt-2">
-          {project.tech.slice(0, 5).map((t) => (
-            <span
-              key={t}
-              className="rounded-md border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.02)] px-2 py-0.5 font-mono text-[10px] text-[rgb(var(--fg-muted))] transition-colors group-hover:text-[rgb(var(--fg))]"
-            >
-              {t}
-            </span>
-          ))}
-          {project.tech.length > 5 && (
-            <span className="rounded-md px-2 py-0.5 font-mono text-[10px] text-[rgb(var(--fg-muted))]">
-              +{project.tech.length - 5}
-            </span>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-
-  return primaryLink ? (
-    <a
-      href={primaryLink}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noreferrer noopener" : undefined}
-      className="block will-change-transform"
-      aria-label={`Open ${project.title}`}
-    >
-      {cardInner}
-    </a>
-  ) : (
-    cardInner
+      )}
+    </div>
   );
 }
 
-/* =========================================================================
-   End-of-rail outro card — a soft invitation to the contact section
-   ========================================================================= */
-function RailOutro() {
+function hueFor(p: string): number {
+  switch (p) {
+    case "freelancing": return 210;
+    case "gamefi": return 145;
+    case "chatbot": return 280;
+    case "desktop": return 25;
+    case "social": return 330;
+    case "workshop": return 195;
+    case "mobile": return 90;
+    default: return 0;
+  }
+}
+
+/* ---------- List ---------- */
+function ListView({
+  onOpen,
+}: {
+  onOpen: (i: number, fromEl?: HTMLElement | null) => void;
+}) {
   return (
-    <a
-      href="#contact"
-      className="group relative flex h-[560px] w-[280px] shrink-0 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-[rgb(var(--accent)/0.5)] bg-[rgb(var(--accent)/0.04)] px-8 text-center transition-colors hover:bg-[rgb(var(--accent)/0.08)]"
-    >
-      <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[rgb(var(--accent))]">
-        End of rail
-      </span>
-      <span className="text-xl font-semibold tracking-tight">
-        Want the one that&apos;s not public?
-      </span>
-      <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--accent))] text-[rgb(var(--bg))] shadow-[0_6px_24px_rgb(var(--accent-glow))] transition-transform group-hover:-translate-y-1">
-        <ArrowUpRight className="h-4 w-4" />
-      </span>
-    </a>
+    <ul className="border-t border-[rgb(var(--fg)/0.08)]">
+      {PROJECTS.map((p, i) => (
+        <li key={p.evidence}>
+          <button
+            onClick={(e) => onOpen(i, e.currentTarget)}
+            data-cursor="hover"
+            className="list-row group"
+          >
+            {/* Thumbnail (same grayscale-to-color behaviour as tiles) */}
+            <div className="list-thumb">
+              <TileVisual project={p} showNumeral={false} />
+              <div className="list-thumb-overlay">
+                <span className="font-mono text-[10px] tracking-[0.18em] text-[rgb(var(--accent))]">
+                  #{p.evidence}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex-1 min-w-0 pl-6">
+              <h3 className="font-serif text-2xl md:text-3xl uppercase leading-tight group-hover:text-[rgb(var(--accent))] transition-colors">
+                {p.title}
+              </h3>
+              <div className="mt-1 mono-dim">
+                {p.subtitle} · {p.tech.slice(0, 4).join(" · ")}
+              </div>
+            </div>
+
+            <div className="hidden md:flex flex-col items-end mono-dim min-w-[110px] pr-6">
+              <span>{p.year}</span>
+              <span>{p.context}</span>
+            </div>
+
+            <span className="mono-dim group-hover:text-[rgb(var(--accent))] transition-colors hidden sm:inline pr-2">
+              OPEN →
+            </span>
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-/* =========================================================================
-   Stack strip — infinite horizontal marquee of all techs
-   ========================================================================= */
-function StackStrip({ items }: { items: string[] }) {
-  const duped = [...items, ...items];
+/* ---------- Viewer overlay (red ambiance + glass) ---------- */
+function Viewer({
+  project,
+  index,
+  total,
+  origin,
+  onClose,
+  onNext,
+  onPrev,
+}: {
+  project: Project;
+  index: number;
+  total: number;
+  origin: Origin | null;
+  onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+}) {
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") onNext();
+      if (e.key === "ArrowLeft") onPrev();
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose, onNext, onPrev]);
+
+  React.useEffect(() => {
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, []);
+
+  // Clip-path circle reveal from origin. Falls back to center if no origin.
+  const ox = origin?.x ?? (typeof window !== "undefined" ? window.innerWidth / 2 : 0);
+  const oy = origin?.y ?? (typeof window !== "undefined" ? window.innerHeight / 2 : 0);
+  const maxR =
+    typeof window !== "undefined"
+      ? Math.hypot(
+          Math.max(ox, window.innerWidth - ox),
+          Math.max(oy, window.innerHeight - oy),
+        )
+      : 1500;
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mt-6 overflow-hidden strip-mask"
-      aria-label="Tech stack I work with"
+      className="viewer-bg fixed inset-0 z-[1000]"
+      initial={{
+        opacity: 1,
+        clipPath: `circle(0px at ${ox}px ${oy}px)`,
+      }}
+      animate={{
+        opacity: 1,
+        clipPath: `circle(${maxR}px at ${ox}px ${oy}px)`,
+      }}
+      exit={{
+        opacity: 1,
+        clipPath: `circle(0px at ${ox}px ${oy}px)`,
+      }}
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="flex w-[200%] animate-marquee gap-3 gpu">
-        {duped.map((skill, i) => (
-          <span
-            key={`${skill}-${i}`}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[rgb(var(--glass-stroke))] bg-[rgb(var(--fg)/0.03)] px-4 py-2 font-mono text-[11px] tracking-wide text-[rgb(var(--fg))]"
+      <div className="relative z-10 flex items-center justify-between px-6 md:px-10 py-5 border-b border-[rgb(var(--fg)/0.1)] viewer-glass">
+        <div className="mono-label flex items-center gap-3">
+          <span className="text-[rgb(var(--accent))]">PROJECT</span>
+          <span className="text-[rgb(var(--fg)/0.5)]">#{project.evidence}</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onPrev}
+            aria-label="Previous project"
+            className="grid place-items-center w-9 h-9 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
           >
-            <span
-              aria-hidden
-              className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--accent))] shadow-[0_0_8px_rgb(var(--accent)/0.6)]"
-            />
-            {skill}
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="mono-dim px-2">
+            {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </span>
-        ))}
+          <button
+            onClick={onNext}
+            aria-label="Next project"
+            className="grid place-items-center w-9 h-9 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="ml-2 grid place-items-center w-9 h-9 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
+
+      <motion.div
+        key={project.evidence}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.18 }}
+        className="relative z-10 grid grid-cols-1 lg:grid-cols-[320px_1fr_340px] gap-0 h-[calc(100vh-72px)] overflow-y-auto"
+      >
+        {/* Sidebar */}
+        <aside className="border-r border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
+          <div className="bracket-frame border border-[rgb(var(--fg)/0.08)] p-5 bg-black/40">
+            <span className="br-tl" />
+            <span className="br-tr" />
+            <span className="br-bl" />
+            <span className="br-br" />
+
+            <h3 className="mono-label mb-5">Metadata</h3>
+
+            <SidebarRow label="Year" value={project.year} />
+            <SidebarRow label="Context" value={project.context ?? "Personal"} />
+            {project.client && <SidebarRow label="Client" value={project.client} />}
+            {project.time && <SidebarRow label="Time" value={project.time} />}
+            <SidebarRow
+              label="Team"
+              value={project.team ? "Collaborative" : "Solo"}
+            />
+
+            <div className="mt-6">
+              <div className="mono-dim mb-2">Tags</div>
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="font-mono text-[10px] uppercase tracking-[0.16em] px-2 py-1 border border-[rgb(var(--fg)/0.15)]"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <div className="mono-dim mb-2">Stacks</div>
+              <div className="flex flex-wrap gap-2">
+                {project.tech.map((t) => (
+                  <span
+                    key={t}
+                    className="font-mono text-[10px] uppercase tracking-[0.16em] px-2 py-1 border border-[rgb(var(--accent)/0.3)] text-[rgb(var(--accent))]"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {project.links && project.links.length > 0 && (
+              <div className="mt-6">
+                <div className="mono-dim mb-2">Useful Links</div>
+                <ul className="space-y-2">
+                  {project.links.map((l) => (
+                    <li key={l.href}>
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 font-mono text-[11px] text-[rgb(var(--fg)/0.8)] hover:text-[rgb(var(--accent))] transition"
+                      >
+                        {l.label.toLowerCase().includes("github") ? (
+                          <Github className="w-3.5 h-3.5" />
+                        ) : (
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        )}
+                        {l.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {/* Brief */}
+        <article className="relative p-6 md:p-14 overflow-y-auto">
+          <div className="max-w-2xl">
+            <div className="mono-label mb-3">{project.type}</div>
+            <h2 className="font-serif text-4xl md:text-6xl uppercase leading-[0.95] tracking-tight">
+              {project.title}
+            </h2>
+            <div className="mono-dim mt-3">{project.subtitle}</div>
+
+            <div className="mt-12">
+              <div className="mono-label mb-3 flex items-center gap-3">
+                <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+                Brief
+              </div>
+              <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">
+                {project.mission}
+              </p>
+            </div>
+
+            {project.intervention && (
+              <div className="mt-10">
+                <div className="mono-label mb-3 flex items-center gap-3">
+                  <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+                  My Role
+                </div>
+                <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">
+                  {project.intervention}
+                </p>
+              </div>
+            )}
+
+            <div className="mt-14 pt-6 border-t border-[rgb(var(--fg)/0.08)] mono-dim">
+              Press ESC to close. Use arrow keys to navigate.
+            </div>
+          </div>
+        </article>
+
+        {/* Gallery */}
+        <aside className="hidden lg:block border-l border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
+          <div className="mono-label mb-5 flex items-center gap-3">
+            <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+            Gallery
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="gallery-slot bracket-frame aspect-[4/5] border border-[rgb(var(--fg)/0.08)] grid place-items-center"
+              >
+                <span className="br-tl" />
+                <span className="br-tr" />
+                <span className="br-bl" />
+                <span className="br-br" />
+                <div className="text-center pointer-events-none">
+                  <div className="font-mono text-[9px] tracking-[0.2em] text-[rgb(var(--fg)/0.5)]">
+                    IMG_{String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div className="font-mono text-[8px] tracking-[0.2em] text-[rgb(var(--fg)/0.3)] mt-1">
+                    UNCLASSIFIED
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-6 mono-dim text-[10px] leading-relaxed">
+            Awaiting upload. Project captures will populate this gallery as
+            cases are documented.
+          </div>
+        </aside>
+      </motion.div>
     </motion.div>
+  );
+}
+
+function SidebarRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-2 border-b border-[rgb(var(--fg)/0.06)] last:border-0">
+      <span className="mono-dim">{label}</span>
+      <span className="font-mono text-[12px] text-[rgb(var(--fg)/0.9)] text-right">
+        {value}
+      </span>
+    </div>
   );
 }

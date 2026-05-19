@@ -1,101 +1,324 @@
 "use client";
 
-import { motion } from "framer-motion";
-import SectionDivider from "./SectionDivider";
+import * as React from "react";
+import { FileText } from "lucide-react";
+import {
+  EDUCATION,
+  EXPERIENCE,
+  SITE,
+  SKILLS_FLAT,
+  SOFT_SKILLS,
+} from "@/lib/data";
+import { useCVModal } from "@/components/CVModal";
 
-const STATS = [
-  { value: "3+", label: "Hackathons shipped" },
-  { value: "200+", label: "Students mentored" },
-  { value: "6+", label: "Live projects" },
-];
-
-/**
- * About — a single central focal point.
- * One big declarative line sets the tone; stats below anchor the eye;
- * a short supporting sentence closes it out. No dense prose blocks.
- */
 export default function About() {
+  const { open } = useCVModal();
+
   return (
     <section
       id="about"
-      className="snap-section relative flex min-h-screen flex-col justify-center px-5 sm:px-8 py-24 sm:py-32"
+      className="relative w-full px-6 md:px-16 py-32 border-t border-[rgb(var(--fg)/0.06)]"
     >
-      {/* Diving-below-surface divider between Hero and About */}
-      <SectionDivider variant="surface" />
+      <header className="mb-14 flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <div className="mono-label mb-3 flex items-center gap-3">
+            <span className="inline-block w-8 h-px bg-[rgb(var(--accent))]" />
+            About / Status: Open to Work
+          </div>
+          <h2 className="h-section uppercase">Subject Profile</h2>
+        </div>
+        <div className="mono-dim">[ Read Only ]</div>
+      </header>
 
-      <div className="mx-auto w-full max-w-5xl flex flex-col items-center text-center gap-10 sm:gap-14">
-        {/* Eyebrow */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center gap-3"
-        >
-          <span className="h-[1px] w-10 bg-[rgb(var(--accent))]" />
-          <span className="section-label-text">About</span>
-          <span className="h-[1px] w-10 bg-[rgb(var(--accent))]" />
-        </motion.div>
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_360px] gap-10">
+        {/* ===== Identity ===== */}
+        <aside className="bracket-frame border border-[rgb(var(--fg)/0.08)] p-6 self-start bg-black/30">
+          <span className="br-tl" />
+          <span className="br-tr" />
+          <span className="br-bl" />
+          <span className="br-br" />
 
-        {/* Focal headline */}
-        <motion.h2
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="h-section max-w-4xl"
-        >
-          I build on-chain products, AI tools, and the quiet
-          infrastructure <span className="gradient-text">that makes them ship.</span>
-        </motion.h2>
+          <div className="font-serif text-xl uppercase tracking-tight">
+            {SITE.name}
+          </div>
+          <div className="mono-dim mt-1">{SITE.handle}</div>
 
-        {/* Central stat row — the anchor */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="grid grid-cols-3 gap-0 w-full max-w-3xl divide-x divide-[rgb(var(--glass-stroke))]"
-        >
-          {STATS.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{
-                duration: 0.7,
-                delay: 0.15 + i * 0.08,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="flex flex-col items-center gap-2 px-3 sm:px-6"
+          <div className="relative mt-5 aspect-square w-full overflow-hidden bracket-frame border border-[rgb(var(--accent)/0.4)] bg-[rgb(var(--bg-alt))]">
+            <span className="br-tl" />
+            <span className="br-tr" />
+            <span className="br-bl" />
+            <span className="br-br" />
+            <div
+              className="absolute inset-0 grid place-items-center font-serif text-7xl uppercase italic text-[rgb(var(--fg)/0.18)]"
+              aria-hidden
             >
-              <span
-                className="font-semibold tracking-tight leading-none text-[rgb(var(--accent))]"
-                style={{ fontSize: "clamp(2.75rem, 7vw, 5rem)" }}
-              >
-                {s.value}
-              </span>
-              <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-[rgb(var(--fg-muted))]">
-                {s.label}
-              </span>
-            </motion.div>
-          ))}
-        </motion.div>
+              AC
+            </div>
+            <div className="absolute top-2 left-2 mono-label text-[9px]">
+              REC · ACTIVE
+            </div>
+            <div className="absolute bottom-2 left-2 mono-dim text-[9px]">
+              ISO_FACE_ID: 99.9%
+            </div>
+            <div className="absolute bottom-2 right-2 mono-label text-[9px]">
+              Indonesia
+            </div>
+            <div className="scanner-line" aria-hidden />
+          </div>
 
-        {/* Supporting sentence */}
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-2xl text-base sm:text-lg leading-relaxed text-[rgb(var(--fg-muted))]"
-        >
-          Computer Science @ BINUS · Solidity, Next.js, Rust, Go.
-          Currently shipping on Base and Lisk, and teaching 200+ peers
-          the same tools on the side.
-        </motion.p>
+          <dl className="mt-5 space-y-2">
+            <Row label="Class" value="DEV_FULLSTACK" />
+            <Row label="XP Level" value="JUNIOR · 3 Y" />
+            <Row label="Lang 1" value="ID (Native)" />
+            <Row label="Lang 2" value="EN (Fluent)" />
+          </dl>
+
+          <div className="mt-6 border border-[rgb(var(--accent)/0.4)] p-3">
+            <div className="flex items-center gap-2 mono-label">
+              <span className="pulse-dot" />
+              System Alert
+            </div>
+            <div className="font-serif text-lg mt-1 leading-tight">
+              Open to Work
+            </div>
+            <div className="mono-dim mt-1">Remote, Hybrid Ready</div>
+          </div>
+
+          <button
+            type="button"
+            onClick={open}
+            className="btn-ghost-noir mt-5 w-full justify-center"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            Open Dossier (CV)
+          </button>
+        </aside>
+
+        {/* ===== Main column. Clean Killian-style flow. ===== */}
+        <div>
+          <div className="mono-label mb-3 flex items-center gap-3">
+            <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+            Competence Analysis Report
+          </div>
+
+          <p className="font-serif text-2xl md:text-[2rem] leading-[1.25] text-[rgb(var(--fg)/0.95)] max-w-[44ch]">
+            Hybrid developer obsessed with{" "}
+            <span className="text-redact">technical rigor</span> and{" "}
+            <span className="text-redact">product impact</span>.
+          </p>
+
+          {/* Education */}
+          <div className="mt-14">
+            <div className="mono-label mb-5 flex items-center gap-3">
+              <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+              Academic Log [Education]
+            </div>
+            <ul className="space-y-4">
+              {EDUCATION.map((e) => (
+                <li
+                  key={e.school}
+                  className="flex flex-wrap items-baseline gap-4"
+                >
+                  <span className="text-redact font-mono text-[11px]">
+                    [{e.school.toUpperCase()}]
+                  </span>
+                  <span className="mono-dim">{e.period}</span>
+                  <span className="font-serif text-lg text-[rgb(var(--fg)/0.95)]">
+                    {e.degree}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Experience */}
+          <div className="mt-14">
+            <div className="mono-label mb-5 flex items-center gap-3">
+              <span className="inline-block w-6 h-px bg-[rgb(var(--accent))]" />
+              Field Operations [Experience]
+            </div>
+            <ul className="space-y-5">
+              {EXPERIENCE.map((x) => (
+                <li
+                  key={x.role + x.company}
+                  className="flex flex-wrap items-baseline gap-4"
+                >
+                  <span className="text-redact font-mono text-[11px]">
+                    [{x.company.toUpperCase()}]
+                  </span>
+                  <span className="mono-dim">{x.period}</span>
+                  <span className="font-serif text-lg text-[rgb(var(--fg)/0.95)]">
+                    {x.role}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* ===== Capabilities (widened) ===== */}
+        <aside className="self-start">
+          <div className="mono-label">Equipment Inventory</div>
+
+          <div className="mt-5">
+            <div className="mono-dim mb-3">Hard Skills</div>
+            <div className="flex flex-wrap gap-2">
+              {SKILLS_FLAT.map((s) => (
+                <span
+                  key={s}
+                  className="font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition-colors cursor-default whitespace-nowrap"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-7">
+            <div className="mono-dim mb-3">Soft Skills</div>
+            <div className="flex flex-wrap gap-2">
+              {SOFT_SKILLS.map((s) => (
+                <span
+                  key={s}
+                  className="font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border border-[rgb(var(--accent)/0.4)] text-[rgb(var(--accent))] whitespace-nowrap"
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-10 bracket-frame border border-[rgb(var(--fg)/0.08)] p-4 aspect-square">
+            <span className="br-tl" />
+            <span className="br-tr" />
+            <span className="br-bl" />
+            <span className="br-br" />
+            <div className="mono-label">Danger: High</div>
+            <BlockchainSpin />
+          </div>
+        </aside>
       </div>
     </section>
+  );
+}
+
+function BlockchainSpin() {
+  const hw = 28;   // half-width of block (viewBox units)
+  const th = 13;   // top-face half-height
+  const sh = 28;   // side-face screen height
+
+  // All blocks drawn at cy=0; CSS translates each to its slot in time.
+  const topPts = `0,${-th} ${hw},0 0,${th} ${-hw},0`;
+  const frPts = `0,${th} ${hw},0 ${hw},${sh} 0,${th + sh}`;
+  const flPts = `0,${th} ${-hw},0 ${-hw},${sh} 0,${th + sh}`;
+
+  const hashes = ["0xA3F1", "0x4B92", "0xC7D8", "0x91EE", "0x52BC"];
+
+  return (
+    <div className="chain-wrap mt-2">
+      <span className="chain-link top" aria-hidden />
+      <span className="chain-link bottom" aria-hidden />
+
+      <svg
+        className="bc-svg"
+        viewBox="-80 -120 160 240"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden
+      >
+        <defs>
+          <linearGradient id="bc-top" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="rgb(255,200,110)" />
+            <stop offset="60%" stopColor="rgb(255,110,50)" />
+            <stop offset="100%" stopColor="rgb(190,30,30)" />
+          </linearGradient>
+          <linearGradient id="bc-left" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="rgb(110,18,18)" />
+            <stop offset="100%" stopColor="rgb(40,8,8)" />
+          </linearGradient>
+          <linearGradient id="bc-right" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="rgb(190,40,30)" />
+            <stop offset="100%" stopColor="rgb(90,18,12)" />
+          </linearGradient>
+          <linearGradient id="bc-edge" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="rgb(255,90,50)" />
+            <stop offset="60%" stopColor="rgb(255,160,60)" />
+            <stop offset="100%" stopColor="rgb(240,200,90)" />
+          </linearGradient>
+        </defs>
+
+        {/* Static guide line for the chain axis */}
+        <line
+          x1="0"
+          y1="-110"
+          x2="0"
+          y2="110"
+          stroke="rgb(255 42 42 / 0.18)"
+          strokeWidth="0.6"
+          strokeDasharray="2 3"
+        />
+
+        {/* Five identical block groups, each in its own animation phase */}
+        {hashes.map((hash, i) => (
+          <g key={i} className={`bc-block b${i + 1}`}>
+            <polygon
+              points={flPts}
+              fill="url(#bc-left)"
+              stroke="url(#bc-edge)"
+              strokeWidth="1.1"
+              strokeLinejoin="miter"
+            />
+            <polygon
+              points={frPts}
+              fill="url(#bc-right)"
+              stroke="url(#bc-edge)"
+              strokeWidth="1.1"
+              strokeLinejoin="miter"
+            />
+            <polygon
+              points={topPts}
+              fill="url(#bc-top)"
+              stroke="url(#bc-edge)"
+              strokeWidth="1.1"
+              strokeLinejoin="miter"
+              opacity="0.9"
+            />
+            <text x={4} y={th + sh * 0.6} className="bc-hash" textAnchor="start">
+              {hash}
+            </text>
+            <text
+              x={-22}
+              y={th + sh * 0.6}
+              className="bc-hash"
+              textAnchor="start"
+              fill="rgb(255,210,110)"
+            >
+              {`#${String(i + 1).padStart(2, "0")}`}
+            </text>
+            <circle cx={0} cy={0} r="1.6" fill="rgb(255,220,140)" opacity="0.9" />
+          </g>
+        ))}
+
+        {/* Fixed pulse nodes marking the chain's continuation */}
+        <circle cx="0" cy="-110" r="2.6" fill="rgb(255,90,90)" className="bc-pulse" />
+        <circle cx="0" cy="110" r="2.6" fill="rgb(255,90,90)" className="bc-pulse" />
+      </svg>
+
+      {/* Orbital particles around the stack */}
+      <span className="bc-particle p1" aria-hidden />
+      <span className="bc-particle p2" aria-hidden />
+      <span className="bc-particle p3" aria-hidden />
+      <span className="bc-particle p4" aria-hidden />
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <dt className="mono-dim">{label}</dt>
+      <dd className="font-mono text-[11px] text-[rgb(var(--fg)/0.9)]">
+        {value}
+      </dd>
+    </div>
   );
 }

@@ -1,17 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import SceneBackground from "@/components/SceneBackground";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import ScrollProgress from "@/components/ScrollProgress";
 import { CVModalProvider } from "@/components/CVModal";
 import CustomCursor from "@/components/CustomCursor";
+import Hud from "@/components/Hud";
+import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
-  title: "Alexander Christian · Blockchain & AI Developer",
+  title: "Alexander Christian · Case File KH-03",
   description:
-    "Computer Science student and fullstack developer building dApps on Base and Lisk, and AI tools for Indonesian markets. Solidity, Next.js, Rust, and more.",
+    "Fullstack and blockchain developer. Shipped work across Solidity, Next.js, Rust, AI/ML for Indonesian markets and L2 ecosystems.",
   keywords: [
     "Alexander Christian",
     "alexcsl",
@@ -25,7 +22,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Alexander Christian Suryanto Linggodigdo" }],
   creator: "Alexander Christian",
   openGraph: {
-    title: "Alexander Christian — Blockchain & AI Developer",
+    title: "Alexander Christian, Blockchain and AI Developer",
     description:
       "Fullstack developer building on-chain applications across Base, Lisk, and beyond.",
     type: "website",
@@ -33,22 +30,16 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alexander Christian — Blockchain & AI Developer",
+    title: "Alexander Christian, Blockchain and AI Developer",
     description:
       "Fullstack developer building on-chain applications across Base, Lisk, and beyond.",
     creator: "@alexcsl10",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#eef6fd" },
-    { media: "(prefers-color-scheme: dark)", color: "#14100c" },
-  ],
+  themeColor: "#050505",
   width: "device-width",
   initialScale: 1,
 };
@@ -59,29 +50,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="relative min-h-screen font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <CVModalProvider>
-            <SceneBackground />
-            <ScrollProgress />
-            <CustomCursor />
-            <div className="relative z-10 flex min-h-screen flex-col">
-              <Navigation />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
-          </CVModalProvider>
-        </ThemeProvider>
+      <body className="relative min-h-screen bg-[rgb(var(--bg))] text-[rgb(var(--fg))] antialiased">
+        <CVModalProvider>
+          {/* Background layers */}
+          <div className="grid-bg" aria-hidden />
+          <div className="vignette" aria-hidden />
+
+          {/* Persistent HUD overlay */}
+          <Hud />
+
+          {/* Techno scroll progress */}
+          <ScrollProgress />
+
+          {/* Custom cursor */}
+          <CustomCursor />
+
+          {/* Page content */}
+          <main className="relative z-10">{children}</main>
+
+          {/* Noise grain on top */}
+          <div className="noise-overlay" aria-hidden />
+        </CVModalProvider>
       </body>
     </html>
   );
