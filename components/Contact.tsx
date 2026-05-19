@@ -1,102 +1,92 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowUpRight, Download, Eye, Github, Linkedin, Mail } from "lucide-react";
-import SectionHeader from "./SectionHeader";
+import * as React from "react";
+import { FileText, Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { SITE } from "@/lib/data";
-import { useCVModal } from "./CVModal";
-
-const LINKS = [
-  { label: "Email", value: SITE.email, href: `mailto:${SITE.email}`, icon: Mail },
-  { label: "GitHub", value: "@alexcsl", href: SITE.github, icon: Github },
-  { label: "LinkedIn", value: "in/alexcsl", href: SITE.linkedin, icon: Linkedin },
-];
+import { useCVModal } from "@/components/CVModal";
 
 export default function Contact() {
   const { open: openCV } = useCVModal();
   return (
-    <section id="contact" className="snap-section relative flex min-h-screen flex-col justify-center px-5 sm:px-8 py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl">
-        <SectionHeader
-          label="Contact"
-          title={
-            <>
-              Let&apos;s build{" "}
-              <span className="gradient-text">something&nbsp;good.</span>
-            </>
-          }
-          description="Open to collaborations, hackathon teams, and internship opportunities in blockchain, AI, or fullstack engineering."
-        />
+    <section
+      id="contact"
+      className="relative w-full px-6 md:px-16 py-32 border-t border-[rgb(var(--fg)/0.06)] overflow-hidden"
+    >
+      {/* Marquee behind */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.06] overflow-hidden"
+      >
+        <div className="marquee font-serif italic text-[10rem] leading-none whitespace-nowrap text-[rgb(var(--fg))]">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <span key={i}>
+              Initiate Protocol · Start Transmission · Channel Open ·
+            </span>
+          ))}
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="glass-card lg:col-span-7 p-7 sm:p-10 flex flex-col gap-6"
+      <div className="relative z-10 max-w-5xl mx-auto text-center">
+        <div className="mono-label mb-6 flex items-center justify-center gap-3">
+          <span className="pulse-dot" />
+          Channel Open · Awaiting Transmission
+        </div>
+
+        <h2 className="font-serif text-[clamp(2.5rem,8vw,7rem)] leading-[0.95] tracking-tight">
+          <span className="italic font-normal text-[rgb(var(--fg)/0.85)]">
+            What if we
+          </span>
+          <br />
+          <span className="uppercase">worked together?</span>
+        </h2>
+
+        <div className="mt-12 flex justify-center">
+          <a href={`mailto:${SITE.email}`} className="btn-noir text-base px-7 py-4">
+            <Mail className="w-4 h-4" />
+            Initiate Contact
+          </a>
+        </div>
+
+        <div className="mt-6 flex items-center justify-center gap-4 flex-wrap">
+          <button type="button" onClick={openCV} className="btn-ghost-noir">
+            <FileText className="w-3.5 h-3.5" />
+            View CV
+          </button>
+          <a
+            href={SITE.github}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-ghost-noir"
           >
-            <div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--accent))]">
-                Get in touch
-              </span>
-              <h3 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight">
-                The fastest way is email.
-              </h3>
-              <p className="mt-3 text-[rgb(var(--fg-muted))] leading-relaxed">
-                I reply to most messages within a day. For everything else, here&apos;s where
-                else you can find me online.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-2">
-              <a href={`mailto:${SITE.email}`} className="btn-primary">
-                <Mail className="h-4 w-4" /> {SITE.email}
-              </a>
-              <button type="button" onClick={openCV} className="btn-ghost">
-                <Eye className="h-4 w-4" /> View CV
-              </button>
-              <a href={SITE.cv} download className="btn-ghost">
-                <Download className="h-4 w-4" /> Download
-              </a>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex flex-col gap-3"
+            <Github className="w-3.5 h-3.5" />
+            [ GitHub ]
+          </a>
+          <a
+            href={SITE.linkedin}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-ghost-noir"
           >
-            {LINKS.map((link) => {
-              const Icon = link.icon;
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target={link.href.startsWith("http") ? "_blank" : undefined}
-                  rel={link.href.startsWith("http") ? "noreferrer noopener" : undefined}
-                  className="glass-card flex items-center justify-between gap-4 p-5 hover:border-[rgb(var(--accent)/0.4)] group"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[rgb(var(--accent)/0.12)] text-[rgb(var(--accent))]">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--fg-muted))]">
-                        {link.label}
-                      </span>
-                      <span className="text-sm font-medium text-[rgb(var(--fg))]">
-                        {link.value}
-                      </span>
-                    </div>
-                  </div>
-                  <ArrowUpRight className="h-4 w-4 text-[rgb(var(--fg-muted))] group-hover:text-[rgb(var(--accent))] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
-                </a>
-              );
-            })}
-          </motion.div>
+            <Linkedin className="w-3.5 h-3.5" />
+            [ LinkedIn ]
+          </a>
+          <a
+            href={SITE.twitter}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-ghost-noir"
+          >
+            <Twitter className="w-3.5 h-3.5" />
+            [ X ]
+          </a>
+        </div>
+
+        <div className="mt-20 mono-dim flex items-center justify-center gap-4 flex-wrap">
+          <span>Secure Line Established</span>
+          <span className="text-[rgb(var(--fg)/0.2)]">·</span>
+          <span>© {new Date().getFullYear()} {SITE.fullName}</span>
+          <span className="text-[rgb(var(--fg)/0.2)]">·</span>
+          <span>End of Transmission</span>
         </div>
       </div>
     </section>

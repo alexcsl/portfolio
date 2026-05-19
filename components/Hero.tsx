@@ -1,174 +1,221 @@
 "use client";
 
 import * as React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Github, Linkedin, Mail } from "lucide-react";
-import { SITE } from "@/lib/data";
-import MagneticButton from "./MagneticButton";
-
-/**
- * Each word ties back to a project:
- *   - on-chain dApps       → Freelancing Platform / fish-it
- *   - Web3 games           → On-Chain GameFi (Lisk)
- *   - AI for UMKMs         → Hyperlocal AI Market Chatbot
- *   - native desktop apps  → RUSA Desktop (Rust/Tauri)
- *   - Go backends          → hoshibmatchi (Go/Postgres/Redis)
- */
-const ROTATING_WORDS = [
-  "on-chain dApps",
-  "Web3 games",
-  "AI chatbots",
-  "desktop apps",
-  "Go backends",
-];
-
-const container = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 28, filter: "blur(10px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
+import { motion } from "framer-motion";
 
 export default function Hero() {
-  const [index, setIndex] = React.useState(0);
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const gpsRef = React.useRef<HTMLDivElement | null>(null);
+  const termRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % ROTATING_WORDS.length);
-    }, 2800);
-    return () => clearInterval(id);
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    let targetPx = 0;
+    let targetPy = 0;
+    let curPx = 0;
+    let curPy = 0;
+
+    const apply = () => {
+      // Gentler ease so motion feels soft.
+      curPx += (targetPx - curPx) * 0.08;
+      curPy += (targetPy - curPy) * 0.08;
+
+      const mxPct = 50 + curPx * 50;
+      const myPct = 50 + curPy * 50;
+      el.style.setProperty("--mx", `${mxPct}%`);
+      el.style.setProperty("--my", `${myPct}%`);
+
+      // Both cards drift WITH the cursor. GPS = subtle, Terminal = slightly bolder.
+      if (gpsRef.current) {
+        gpsRef.current.style.transform =
+          `perspective(1100px) ` +
+          `translate3d(${(curPx * 28).toFixed(2)}px, ${(curPy * 18).toFixed(2)}px, 0) ` +
+          `rotateY(${(curPx * 5).toFixed(2)}deg) ` +
+          `rotateX(${(curPy * -4).toFixed(2)}deg) ` +
+          `rotate(-3deg)`;
+      }
+      if (termRef.current) {
+        termRef.current.style.transform =
+          `perspective(1100px) ` +
+          `translate3d(${(curPx * 38).toFixed(2)}px, ${(curPy * 24).toFixed(2)}px, 0) ` +
+          `rotateY(${(curPx * 6).toFixed(2)}deg) ` +
+          `rotateX(${(curPy * -5).toFixed(2)}deg) ` +
+          `rotate(3deg)`;
+      }
+
+      // Continue easing while not at rest
+      if (
+        Math.abs(targetPx - curPx) > 0.001 ||
+        Math.abs(targetPy - curPy) > 0.001
+      ) {
+        raf = requestAnimationFrame(apply);
+      } else {
+        raf = 0;
+      }
+    };
+
+    const setTarget = (clientX: number, clientY: number) => {
+      const r = el.getBoundingClientRect();
+      targetPx = ((clientX - r.left) / r.width - 0.5) * 2;
+      targetPy = ((clientY - r.top) / r.height - 0.5) * 2;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+
+    const onMove = (e: MouseEvent) => setTarget(e.clientX, e.clientY);
+    const onLeave = () => {
+      targetPx = 0;
+      targetPy = 0;
+      if (!raf) raf = requestAnimationFrame(apply);
+    };
+
+    // Listen on the window so the spotlight veil (z:30, pointer-events:none)
+    // doesn't matter — the events fire regardless. We just gate on whether
+    // the cursor is inside the hero's bounding rect.
+    const winMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      if (
+        e.clientX < r.left ||
+        e.clientX > r.right ||
+        e.clientY < r.top ||
+        e.clientY > r.bottom
+      ) {
+        onLeave();
+        return;
+      }
+      setTarget(e.clientX, e.clientY);
+    };
+
+    window.addEventListener("mousemove", winMove, { passive: true });
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      window.removeEventListener("mousemove", winMove);
+      el.removeEventListener("mouseleave", onLeave);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
     <section
-      id="top"
-      className="snap-section relative flex min-h-screen flex-col justify-center px-5 sm:px-8 pt-28 pb-24"
+      ref={ref}
+      id="hero"
+      className="relative min-h-[100svh] w-full overflow-hidden flex items-center justify-center px-6 md:px-16"
     >
-      <div className="mx-auto w-full max-w-7xl">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col gap-6 sm:gap-7"
-        >
-          {/* Huge display heading — two lines so long rotating words can't overflow */}
-          <div className="flex flex-col gap-0 sm:gap-1">
-            <motion.span
-              variants={item}
-              className="h-display block text-outline select-none leading-[0.88]"
-            >
-              I build
-            </motion.span>
+      {/* Faint hex/binary stream as ambient noise — blockchain/AI aesthetic */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none select-none font-mono text-[10px] leading-loose p-8 overflow-hidden"
+      >
+        {Array.from({ length: 10 }).map((_, i) => (
+          <p
+            key={i}
+            className="whitespace-nowrap"
+            style={{
+              color:
+                i % 3 === 0
+                  ? "rgb(var(--gold) / 0.05)"
+                  : "rgb(var(--fg) / 0.04)",
+            }}
+          >
+            0x{(i * 0xa3f1 + 0x4b92).toString(16).toUpperCase().padStart(8, "0")} ·
+            01101001 11000010 · TX_HASH 0x9{i}EE2D{(i * 17) % 256} · BLOCK#{18293120 + i * 11} ·
+            NODE_OK · 0x{(i * 0xb1c7).toString(16).toUpperCase().padStart(6, "0")} ·
+          </p>
+        ))}
+      </div>
 
-            {/* Rotating word on its own line — size is slightly smaller than "I build"
-                so even the longest phrase ("on-chain dApps") fits on one line. */}
-            <div className="h-rotator relative flex items-center gap-1 w-full">
-              <div
-                className="relative inline-block overflow-hidden"
-                style={{ paddingBlock: "0.1em" }}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.span
-                    key={ROTATING_WORDS[index]}
-                    initial={{ y: "55%", opacity: 0, filter: "blur(12px)" }}
-                    animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-                    exit={{ y: "-50%", opacity: 0, filter: "blur(10px)" }}
-                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                    className="gradient-text inline-block whitespace-nowrap"
-                  >
-                    {ROTATING_WORDS[index]}.
-                  </motion.span>
-                </AnimatePresence>
-              </div>
-              <motion.span
-                aria-hidden
-                variants={item}
-                className="inline-block bg-[rgb(var(--accent))] shrink-0"
-                style={{
-                  width: "0.07em",
-                  height: "0.72em",
-                  animation: "cursorBlink 1s steps(1) infinite",
-                  marginLeft: "0.04em",
-                  transform: "translateY(-0.03em)",
-                }}
-              />
-            </div>
+      {/* GPS card */}
+      <motion.div
+        ref={gpsRef}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8, delay: 0.6 }}
+        className="hidden lg:block absolute top-[16%] left-[6%] z-[5] will-change-transform"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        <div className="bracket-frame p-3 bg-black/55 backdrop-blur-sm border border-[rgb(var(--fg)/0.1)] floaty">
+          <span className="br-tl" />
+          <span className="br-tr" />
+          <span className="br-bl" />
+          <span className="br-br" />
+          <div className="mono-label mb-1">GPS_LOCATION</div>
+          <div className="font-mono text-[11px] text-[rgb(var(--fg)/0.75)] leading-relaxed">
+            LAT: -6.2244° S
+            <br />
+            LON: 106.6537° E
           </div>
+        </div>
+      </motion.div>
 
-          {/* Signature block */}
-          <motion.div
-            variants={item}
-            className="mt-2 sm:mt-4 flex flex-col gap-2 max-w-xl"
+      {/* Terminal card */}
+      <motion.div
+        ref={termRef}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+        className="hidden lg:block absolute bottom-[16%] right-[8%] z-[5] will-change-transform"
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        <div className="bracket-frame p-3 bg-black/65 backdrop-blur-sm border border-[rgb(var(--fg)/0.1)] w-[260px]">
+          <span className="br-tl" />
+          <span className="br-tr" />
+          <span className="br-bl" />
+          <span className="br-br" />
+          <div className="mono-label mb-2">TERMINAL_LOG</div>
+          <div className="font-mono text-[11px] leading-relaxed text-[rgb(var(--fg)/0.75)]">
+            <p>&gt;&gt; deploying to base...</p>
+            <p>&gt;&gt; tx confirmed ✓</p>
+            <p>&gt;&gt; indexed on ponder</p>
+            <p className="text-[rgb(var(--accent))]">&gt;&gt; system online_</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Centered content */}
+      <div className="relative z-[10] w-full max-w-[1500px] mx-auto text-center flex flex-col items-center">
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="h-display uppercase"
+        >
+          <span className="block">Alexander</span>
+          <span
+            className="block italic h-italic -mt-2"
+            style={{
+              background:
+                "linear-gradient(120deg, rgb(var(--gold-soft)) 0%, rgb(var(--gold)) 50%, rgb(var(--gold-deep)) 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
           >
-            <div className="flex items-center gap-3">
-              <span className="h-[1px] w-10 bg-[rgb(var(--fg)/0.3)]" />
-              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[rgb(var(--fg-muted))]">
-                authored by
-              </span>
-            </div>
-            <p className="text-2xl sm:text-3xl font-semibold tracking-tight text-[rgb(var(--fg))]">
-              {SITE.name}
-              <span className="text-[rgb(var(--accent))]">.</span>
-            </p>
-            <p className="text-sm sm:text-base text-[rgb(var(--fg-muted))]">
-              {SITE.tagline} · Computer Science @ BINUS University, Jakarta.
-            </p>
-          </motion.div>
+            Christian
+          </span>
+        </motion.h1>
 
-          {/* CTAs */}
-          <motion.div variants={item} className="flex flex-wrap gap-3 mt-1">
-            <MagneticButton href="#projects" className="btn-primary" strength={0.2}>
-              View selected work <ArrowUpRight className="h-4 w-4" />
-            </MagneticButton>
-            <MagneticButton href="#contact" className="btn-ghost" strength={0.2}>
-              Get in touch
-            </MagneticButton>
-          </motion.div>
-
-          {/* Socials only — no scroll cue */}
-          <motion.div
-            variants={item}
-            className="flex items-center gap-5 pt-2"
-          >
-            <a
-              href={SITE.github}
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="GitHub"
-              className="text-[rgb(var(--fg-muted))] hover:text-[rgb(var(--accent))] transition-colors"
-            >
-              <Github className="h-5 w-5" />
-            </a>
-            <a
-              href={SITE.linkedin}
-              target="_blank"
-              rel="noreferrer noopener"
-              aria-label="LinkedIn"
-              className="text-[rgb(var(--fg-muted))] hover:text-[rgb(var(--accent))] transition-colors"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <a
-              href={`mailto:${SITE.email}`}
-              aria-label="Email"
-              className="text-[rgb(var(--fg-muted))] hover:text-[rgb(var(--accent))] transition-colors"
-            >
-              <Mail className="h-5 w-5" />
-            </a>
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+          className="mt-8 text-sm sm:text-base leading-relaxed text-[rgb(var(--fg)/0.85)] font-mono space-y-1"
+        >
+          <p>
+            <span className="accent-word">Fullstack</span> Developer.
+          </p>
+          <p>
+            <span className="accent-word">Smart Contract</span> Developer with{" "}
+            <span className="gold-word">Business</span> Mindset.
+          </p>
+          <p>Seeking Opportunities.</p>
         </motion.div>
       </div>
+
+      {/* Spotlight veil ABOVE content. Pointer-events: none. */}
+      <div className="spotlight" aria-hidden />
+      <div className="spotlight-glow" aria-hidden />
+      <div className="scanner-line" aria-hidden />
     </section>
   );
 }

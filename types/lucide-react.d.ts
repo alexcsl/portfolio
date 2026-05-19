@@ -19,4 +19,12 @@ declare module "lucide-react" {
   export const Users: LucideIcon;
   export const Waves: LucideIcon;
   export const X: LucideIcon;
+  export const Twitter: LucideIcon;
+  export const ChevronLeft: LucideIcon;
+  export const ChevronRight: LucideIcon;
+  export const GraduationCap: LucideIcon;
+  export const Briefcase: LucideIcon;
+  export const Target: LucideIcon;
+  export const Zap: LucideIcon;
+  export const Languages: LucideIcon;
 }
