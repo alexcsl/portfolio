@@ -19,10 +19,10 @@ export default function About() {
       id="about"
       className="relative w-full px-6 md:px-16 py-32 border-t border-[rgb(var(--fg)/0.06)]"
     >
-      <header className="mb-14 flex items-end justify-between flex-wrap gap-4">
+      <header className="flex items-end justify-between flex-wrap gap-4 pb-6 mb-12 border-b border-[rgb(var(--fg)/0.12)]">
         <div>
           <div className="mono-label mb-3 flex items-center gap-3">
-            <span className="inline-block w-8 h-px bg-[rgb(var(--accent))]" />
+            <span className="rule-rg" />
             About / Status: Open to Work
           </div>
           <h2 className="h-section uppercase">Subject Profile</h2>
@@ -61,7 +61,7 @@ export default function About() {
               src="/me.jpeg"
               alt={SITE.name}
               className="absolute inset-0 w-full h-full object-cover"
-              style={{ filter: "grayscale(40%) contrast(1.05)" }}
+              style={{ filter: "grayscale(90%) contrast(1.08) brightness(0.95)" }}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
               }}
@@ -81,7 +81,7 @@ export default function About() {
           </div>
 
           <dl className="mt-5 space-y-2">
-            <Row label="Class" value="DEV_FULLSTACK" />
+            <Row label="Class" value="Fullstack Dev" />
             <Row label="XP Level" value="JUNIOR · 3 Y" />
             <Row label="Lang 1" value="ID (Native)" />
             <Row label="Lang 2" value="EN (Fluent)" />
@@ -108,24 +108,30 @@ export default function About() {
           </button>
         </aside>
 
-        {/* ===== Main column. Clean Killian-style flow. ===== */}
-        <div>
+        {/* ===== Main column. Framed for focus. ===== */}
+        <div className="bracket-frame border border-[rgb(var(--fg)/0.12)] p-7 md:p-9 bg-black/20">
+          <span className="br-tl" />
+          <span className="br-tr" />
+          <span className="br-bl" />
+          <span className="br-br" />
+
           <div className="mono-label mb-3 flex items-center gap-3">
             <span className="rule-rg" />
             Competence Analysis Report
           </div>
 
-          <p className="font-serif text-2xl md:text-[2rem] leading-[1.25] text-[rgb(var(--fg)/0.95)] max-w-[46ch]">
-            Smart contract developer fusing{" "}
-            <span className="text-redact">on-chain rigor</span> with a{" "}
+          <p className="font-serif text-2xl md:text-[2rem] leading-[1.25] text-[rgb(var(--fg)/0.95)] max-w-[52ch]">
+            Fullstack and{" "}
+            <span className="text-redact">smart contract</span> developer with
+            engineering depth and a{" "}
             <span className="text-mint">business mindset</span>.
           </p>
 
           {/* Education */}
-          <div className="mt-14">
+          <div className="mt-12 pt-8 border-t border-[rgb(var(--fg)/0.1)]">
             <div className="mono-label mb-5 flex items-center gap-3">
               <span className="rule-rg" />
-              Academic Log [Education]
+              Education
             </div>
             <ul className="space-y-4">
               {EDUCATION.map((e) => (
@@ -146,10 +152,10 @@ export default function About() {
           </div>
 
           {/* Experience */}
-          <div className="mt-14">
+          <div className="mt-10 pt-8 border-t border-[rgb(var(--fg)/0.1)]">
             <div className="mono-label mb-5 flex items-center gap-3">
               <span className="rule-rg" />
-              Field Operations [Experience]
+              Experience
             </div>
             <ul className="space-y-5">
               {EXPERIENCE.map((x) => (

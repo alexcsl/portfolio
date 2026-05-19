@@ -83,7 +83,12 @@
     line-height: 0.95;
     font-size: clamp(2.5rem, 7vw, 6rem);
   }
-  .h-italic { font-style: italic; font-weight: 400; }
+  .h-italic {
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.05;
+    padding-bottom: 0.1em;
+  }
 
   .mono-label {
     font-family: "JetBrains Mono", ui-monospace, monospace;
@@ -867,7 +872,15 @@ body.viewer-open .scroll-progress {
   transition: background 260ms ease;
   overflow: hidden;
 }
-.list-row:hover { background: rgb(var(--accent) / 0.05); }
+.list-row:hover {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--accent) / 0.10) 0%,
+    rgb(var(--accent) / 0.06) 35%,
+    rgb(var(--gold) / 0.08) 75%,
+    rgb(var(--gold) / 0.12) 100%
+  );
+}
 
 .list-thumb {
   position: relative;

@@ -46,6 +46,8 @@ export type Project = {
   /** Optional cover image (path under /public). Falls back to a generated
    *  gradient visual if absent. Drop a file in /public and reference it here. */
   image?: string;
+  /** Optional gallery image paths shown in the viewer's right column. */
+  gallery?: string[];
 };
 
 export const PROJECTS: Project[] = [
@@ -191,40 +193,65 @@ export const PROJECTS: Project[] = [
 ];
 
 export const SKILLS_FLAT: string[] = [
+  // On-chain
   "Solidity",
   "Foundry",
   "Hardhat",
-  "TypeScript",
-  "React",
-  "Next.js",
-  "Rust",
-  "Tauri",
-  "Go",
-  "Python",
-  "Hono.js",
-  "Tailwind CSS",
-  "PostgreSQL",
-  "Supabase",
-  "Drizzle",
-  "Docker",
-  "Kubernetes",
   "Ponder",
   "Onchainkit",
+  // Languages
+  "TypeScript",
+  "JavaScript",
+  "Java",
+  "Kotlin",
+  "Go",
+  "Rust",
+  "Python",
+  "C",
+  "C#",
+  "PHP",
+  // Web & app
+  "React",
+  "Next.js",
+  "Three.js",
+  "Tauri",
+  "Hono.js",
+  "Tailwind CSS",
+  // Data
+  "PostgreSQL",
+  "MySQL",
+  "Supabase",
+  "Drizzle",
+  "Redis",
+  "Spark",
+  // AI / infra
   "TensorFlow",
+  "Docker",
+  "Kubernetes",
+  // Observability
+  "Prometheus",
+  "Grafana",
+  "Tempo",
+  "Loki",
 ];
 
 export const SOFT_SKILLS: string[] = [
-  "Problem Solving",
-  "System Design",
-  "Mentorship",
+  "Taste",
+  "Business Intuition",
+  "Leadership",
+  "Communication",
+  "Adaptation",
+  "AI Fluency",
+  "Critical Thinking",
+  "Systems Thinking",
   "Rapid Iteration",
-  "Cross-team Communication",
+  "Storytelling",
 ];
 
 export const EDUCATION = [
   {
     school: "BINUS University",
-    period: "2023 – Present",
+    period: "2024 – Present",
     degree: "B.Sc. Computer Science",
   },
 ];

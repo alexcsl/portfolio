@@ -46,7 +46,6 @@ export default function Projects() {
           <div className="mono-label mb-3 flex items-center gap-3">
             <span className="rule-rg" />
             <span className="gold-word">Deployments</span>
-            <span className="text-[rgb(var(--fg)/0.4)]">/ Mainnet</span>
           </div>
           <h2 className="h-section uppercase">Projects</h2>
         </div>
@@ -597,31 +596,45 @@ function Viewer({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="gallery-slot bracket-frame aspect-[4/5] border border-[rgb(var(--fg)/0.08)] grid place-items-center"
-              >
-                <span className="br-tl" />
-                <span className="br-tr" />
-                <span className="br-bl" />
-                <span className="br-br" />
-                <div className="text-center pointer-events-none">
-                  <div className="font-mono text-[9px] tracking-[0.2em] text-[rgb(var(--fg)/0.5)]">
-                    IMG_{String(i + 1).padStart(2, "0")}
-                  </div>
-                  <div className="font-mono text-[8px] tracking-[0.2em] text-[rgb(var(--fg)/0.3)] mt-1">
-                    UNCLASSIFIED
+            {Array.from({ length: 6 }).map((_, i) => {
+              const src = project.gallery?.[i];
+              return (
+                <div
+                  key={i}
+                  className="gallery-slot bracket-frame aspect-[4/5] border border-[rgb(var(--fg)/0.08)] grid place-items-center overflow-hidden relative"
+                >
+                  <span className="br-tl" />
+                  <span className="br-tr" />
+                  <span className="br-bl" />
+                  <span className="br-br" />
+                  {src && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={src}
+                      alt={`${project.title} gallery ${i + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      style={{ filter: "grayscale(15%) contrast(1.04)" }}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  )}
+                  <div className="text-center pointer-events-none relative z-10 bg-black/40 px-1.5 py-0.5">
+                    <div className="font-mono text-[9px] tracking-[0.2em] text-[rgb(var(--fg)/0.6)]">
+                      IMG_{String(i + 1).padStart(2, "0")}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          <div className="mt-6 mono-dim text-[10px] leading-relaxed">
-            Awaiting upload. Project captures will populate this gallery as
-            cases are documented.
-          </div>
+          {!project.gallery?.length && (
+            <div className="mt-6 mono-dim text-[10px] leading-relaxed">
+              Awaiting upload. Project captures will populate this gallery as
+              cases are documented.
+            </div>
+          )}
         </aside>
       </motion.div>
     </motion.div>
