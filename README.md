@@ -1,34 +1,36 @@
 # alexcsl.dev — Personal Portfolio
 
 Minimalist, glassmorphism portfolio for Alexander C.
-Built with Next.js 14 (App Router), TypeScript, Tailwind CSS, and Framer Motion.
+Built with Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, and Framer Motion.
 
 ## Features
 
 - Glassmorphism aesthetic with animated gradient orbs
 - Electric blue accent on black/white base
-- Dark and light mode with persistent theme (`next-themes`)
+- Fixed dark presentation set by the root layout
 - Scroll-triggered reveal animations on every section
 - 3D tilt on project cards (mouse-tracking, spring-damped)
 - Filterable project grid (Blockchain / AI / Web / Game)
 - Fully responsive (mobile ≥ 360px through 4K)
 - Downloadable CV (`/Alexander_CV.pdf`)
-- Security headers and strict CSP configured in `next.config.mjs`
+- Security headers and a content security policy configured in `next.config.mjs`
 - SEO metadata, Open Graph, robots.txt, SVG favicon
 
 ## Local development
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
+
+Use Node.js 24.22.1 or newer within the 24.x line. The production content security policy excludes `unsafe-eval`; development mode permits it for Next.js tooling.
 
 Open [http://localhost:3000](http://localhost:3000).
 
 ## Build
 
 ```bash
-npm run build
+npm run check
 npm start
 ```
 
@@ -80,9 +82,9 @@ Replace `public/Alexander_CV.pdf` with a new PDF (same filename) and redeploy.
 
 | Area       | Tool                   |
 | ---------- | ---------------------- |
-| Framework  | Next.js 14 App Router  |
+| Framework  | Next.js 16 App Router  |
 | Styling    | Tailwind CSS 3.4       |
-| Animation  | Framer Motion 11       |
+| Animation  | Framer Motion 14       |
 | Icons      | lucide-react           |
 | Theming    | next-themes            |
 | Fonts      | Inter + JetBrains Mono |

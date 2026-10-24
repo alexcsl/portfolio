@@ -63,7 +63,6 @@ export default function Hero() {
       if (!raf) raf = requestAnimationFrame(apply);
     };
 
-    const onMove = (e: MouseEvent) => setTarget(e.clientX, e.clientY);
     const onLeave = () => {
       targetPx = 0;
       targetPy = 0;

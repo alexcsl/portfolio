@@ -4,13 +4,15 @@ import * as React from "react";
 import { Mountain, Waves } from "lucide-react";
 import { useTheme } from "next-themes";
 
+const emptySubscribe = () => () => {};
+
 export default function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   const current = resolvedTheme ?? theme;
   const isDark = current === "dark";
@@ -24,10 +26,8 @@ export default function ThemeToggle() {
     document.documentElement.style.setProperty("--theme-toggle-x", `${x}px`);
     document.documentElement.style.setProperty("--theme-toggle-y", `${y}px`);
 
-    // eslint-disable-next-line
-    const doc = document as any;
-    if (doc.startViewTransition) {
-      doc.startViewTransition(() => {
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(() => {
         setTheme(isDark ? "light" : "dark");
       });
     } else {
