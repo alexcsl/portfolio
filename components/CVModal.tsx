@@ -56,17 +56,20 @@ export function CVModalProvider({ children }: { children: React.ReactNode }) {
 }
 
 function CVModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [loaded, setLoaded] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!isOpen) setLoaded(false);
-  }, [isOpen]);
-
   return (
     <AnimatePresence>
       {isOpen && (
+        <CVModalContent key="cv-modal" onClose={onClose} />
+      )}
+    </AnimatePresence>
+  );
+}
+
+function CVModalContent({ onClose }: { onClose: () => void }) {
+  const [loaded, setLoaded] = React.useState(false);
+
+  return (
         <motion.div
-          key="cv-modal"
           role="dialog"
           aria-modal="true"
           aria-label="Curriculum Vitae"
@@ -155,7 +158,6 @@ function CVModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                 </div>
               )}
               <iframe
-                key={isOpen ? "cv-open" : "cv-closed"}
                 src={`${SITE.cv}#view=FitH&toolbar=0&navpanes=0`}
                 title="Alexander Christian CV"
                 className="absolute inset-0 h-full w-full"
@@ -173,7 +175,5 @@ function CVModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
             </div>
           </motion.div>
         </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
