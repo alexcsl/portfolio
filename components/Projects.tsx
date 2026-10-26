@@ -1,9 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { createPortal } from "react-dom";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, ExternalLink, Github, X } from "lucide-react";
-import { PROJECTS, type Project } from "@/lib/data";
+import { projects as PROJECTS, type Project } from "@/lib/projects";
+import ProjectGallery from "@/components/ProjectGallery";
 
 type ViewMode = "slider" | "list";
 type Origin = { x: number; y: number };
@@ -12,8 +15,10 @@ export default function Projects() {
   const [view, setView] = React.useState<ViewMode>("slider");
   const [active, setActive] = React.useState<number | null>(null);
   const [origin, setOrigin] = React.useState<Origin | null>(null);
+  const trigger = React.useRef<HTMLElement | null>(null);
 
   const open = (i: number, fromEl?: HTMLElement | null) => {
+    trigger.current = fromEl ?? null;
     if (fromEl) {
       const r = fromEl.getBoundingClientRect();
       setOrigin({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -22,7 +27,10 @@ export default function Projects() {
     }
     setActive(i);
   };
-  const close = () => setActive(null);
+  const close = () => {
+    setActive(null);
+    requestAnimationFrame(() => trigger.current?.focus());
+  };
   const next = () =>
     setActive((i) => (i === null ? 0 : (i + 1) % PROJECTS.length));
   const prev = () =>
@@ -31,9 +39,14 @@ export default function Projects() {
     );
 
   React.useEffect(() => {
+    const main = document.querySelector("main");
+    if (main) main.inert = active !== null;
     if (active !== null) document.body.classList.add("viewer-open");
     else document.body.classList.remove("viewer-open");
-    return () => document.body.classList.remove("viewer-open");
+    return () => {
+      document.body.classList.remove("viewer-open");
+      if (main) main.inert = false;
+    };
   }, [active]);
 
   return (
@@ -63,11 +76,11 @@ export default function Projects() {
       ) : (
         <ListView onOpen={open} />
       )}
-      {/* `open` accepts (index, fromEl) so the viewer scales from the clicked tile/row */}
 
-      <AnimatePresence>
+      {typeof document !== "undefined" && createPortal(<AnimatePresence>
         {active !== null && (
           <Viewer
+            key="project-viewer"
             project={PROJECTS[active]}
             index={active}
             total={PROJECTS.length}
@@ -77,7 +90,7 @@ export default function Projects() {
             onPrev={prev}
           />
         )}
-      </AnimatePresence>
+      </AnimatePresence>, document.body)}
     </section>
   );
 }
@@ -94,6 +107,8 @@ function ViewToggle({
       {(["slider", "list"] as const).map((m) => (
         <button
           key={m}
+          type="button"
+          aria-pressed={view === m}
           onClick={() => setView(m)}
           className={`px-4 py-2 transition-colors ${
             view === m
@@ -155,9 +170,6 @@ function TileRail({
   };
   const onPointerUp = () => {
     const st = state.current;
-    if (st.down && st.moved < 8 && st.downIndex >= 0) {
-      onOpen(st.downIndex, st.downEl);
-    }
     st.down = false;
     setTimeout(() => setDragging(false), 0);
   };
@@ -198,16 +210,18 @@ function TileRail({
         onPointerLeave={onPointerUp}
       >
         {PROJECTS.map((p, i) => (
-          <Tile key={p.evidence} project={p} index={i} />
+          <Tile key={p.slug} project={p} index={i} onOpen={(element, keyboard) => {
+            if (keyboard || state.current.moved < 8) onOpen(i, element);
+          }} />
         ))}
       </div>
     </div>
   );
 }
 
-function Tile({ project, index }: { project: Project; index: number }) {
+function Tile({ project, index, onOpen }: { project: Project; index: number; onOpen: (element: HTMLElement, keyboard: boolean) => void }) {
   return (
-    <div data-tile-index={index} data-cursor="hover" className="tile">
+    <button type="button" data-tile-index={index} data-cursor="hover" className="tile text-left" aria-label={`View ${project.title} details`} onClick={(event) => onOpen(event.currentTarget, event.detail === 0)}>
       <span className="tile-corner c-tl" />
       <span className="tile-corner c-tr" />
       <span className="tile-corner c-bl" />
@@ -217,12 +231,12 @@ function Tile({ project, index }: { project: Project; index: number }) {
 
       <div className="tile-content">
         <div className="flex items-start justify-between">
-          <span className="tile-num">#{project.evidence}</span>
-          <span className="tile-meta">{project.year}</span>
+          <span className="tile-num">#{project.number}</span>
+          <span className="tile-meta">{project.category}</span>
         </div>
 
         <div>
-          <div className="tile-meta mb-2 opacity-80">{project.type}</div>
+          <div className="tile-meta mb-2 opacity-80">{project.eyebrow}</div>
           <h3 className="tile-title">{project.title}</h3>
           <div className="mt-3 flex flex-wrap gap-1.5 max-w-full">
             {project.tech.slice(0, 3).map((t) => (
@@ -236,7 +250,7 @@ function Tile({ project, index }: { project: Project; index: number }) {
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -247,19 +261,15 @@ function TileVisual({
   project: Project;
   showNumeral?: boolean;
 }) {
-  const hue = hueFor(project.preview);
-
-  if (project.image) {
+  const cover = project.media[0];
+  if (cover) {
     return (
       <div
         className="tile-visual"
         aria-hidden
-        style={{
-          backgroundImage: `url("${project.image}")`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+      >
+        <Image src={cover.src} alt="" fill sizes="(max-width: 640px) 280px, 340px" className="object-cover" />
+      </div>
     );
   }
 
@@ -269,9 +279,7 @@ function TileVisual({
       aria-hidden
       style={{
         background: `
-          radial-gradient(120% 70% at 80% 20%, hsl(${hue} 70% 28% / 0.95), transparent 60%),
-          radial-gradient(120% 70% at 10% 90%, hsl(${(hue + 50) % 360} 55% 18% / 0.95), transparent 65%),
-          linear-gradient(160deg, hsl(${hue} 45% 12%) 0%, hsl(${hue} 30% 6%) 60%, #060606 100%)
+          linear-gradient(160deg, #222 0%, #111 60%, #060606 100%)
         `,
       }}
     >
@@ -282,11 +290,11 @@ function TileVisual({
         aria-hidden
       >
         <defs>
-          <pattern id={`g-${project.evidence}`} width="20" height="20" patternUnits="userSpaceOnUse">
+          <pattern id={`g-${project.slug}-${showNumeral ? "tile" : "list"}`} width="20" height="20" patternUnits="userSpaceOnUse">
             <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.3" />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill={`url(#g-${project.evidence})`} />
+        <rect width="100%" height="100%" fill={`url(#g-${project.slug}-${showNumeral ? "tile" : "list"})`} />
       </svg>
 
       {showNumeral && (
@@ -303,24 +311,11 @@ function TileVisual({
             letterSpacing: "-0.04em",
           }}
         >
-          {project.evidence}
+          {project.number}
         </div>
       )}
     </div>
   );
-}
-
-function hueFor(p: string): number {
-  switch (p) {
-    case "freelancing": return 210;
-    case "gamefi": return 145;
-    case "chatbot": return 280;
-    case "desktop": return 25;
-    case "social": return 330;
-    case "workshop": return 195;
-    case "mobile": return 90;
-    default: return 0;
-  }
 }
 
 /* ---------- List ---------- */
@@ -332,7 +327,7 @@ function ListView({
   return (
     <ul className="border-t border-[rgb(var(--fg)/0.08)]">
       {PROJECTS.map((p, i) => (
-        <li key={p.evidence}>
+        <li key={p.slug}>
           <button
             onClick={(e) => onOpen(i, e.currentTarget)}
             data-cursor="hover"
@@ -343,7 +338,7 @@ function ListView({
               <TileVisual project={p} showNumeral={false} />
               <div className="list-thumb-overlay">
                 <span className="font-mono text-[10px] tracking-[0.18em] text-[rgb(var(--accent))]">
-                  #{p.evidence}
+                  #{p.number}
                 </span>
               </div>
             </div>
@@ -353,12 +348,12 @@ function ListView({
                 {p.title}
               </h3>
               <div className="mt-1 mono-dim">
-                {p.subtitle} · {p.tech.slice(0, 4).join(" · ")}
+                {p.eyebrow} · {p.tech.slice(0, 4).join(" · ")}
               </div>
             </div>
 
             <div className="hidden md:flex flex-col items-end mono-dim min-w-[110px] pr-6">
-              <span>{p.year}</span>
+              <span>{p.category}</span>
               <span>{p.context}</span>
             </div>
 
@@ -390,11 +385,23 @@ function Viewer({
   onNext: () => void;
   onPrev: () => void;
 }) {
+  const reducedMotion = useReducedMotion();
+  const dialog = React.useRef<HTMLDivElement>(null);
+  const closeButton = React.useRef<HTMLButtonElement>(null);
+  React.useEffect(() => { closeButton.current?.focus(); }, []);
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "ArrowRight") onNext();
-      if (e.key === "ArrowLeft") onPrev();
+      if (document.getElementById("project-lightbox") || e.defaultPrevented) return;
+      if (e.key === "Escape") { e.preventDefault(); onClose(); }
+      if (e.key === "ArrowRight") { e.preventDefault(); onNext(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); onPrev(); }
+      if (e.key === "Tab") {
+        const controls = Array.from(dialog.current?.querySelectorAll<HTMLElement>('button, a[href]') ?? []);
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
@@ -421,8 +428,13 @@ function Viewer({
 
   return (
     <motion.div
+      ref={dialog}
+      id="project-viewer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="project-title"
       className="viewer-bg fixed inset-0 z-[1000]"
-      initial={{
+      initial={reducedMotion ? false : {
         opacity: 1,
         clipPath: `circle(0px at ${ox}px ${oy}px)`,
       }}
@@ -430,40 +442,41 @@ function Viewer({
         opacity: 1,
         clipPath: `circle(${maxR}px at ${ox}px ${oy}px)`,
       }}
-      exit={{
+      exit={reducedMotion ? { opacity: 0 } : {
         opacity: 1,
         clipPath: `circle(0px at ${ox}px ${oy}px)`,
       }}
-      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: reducedMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="relative z-10 flex items-center justify-between px-6 md:px-10 py-5 border-b border-[rgb(var(--fg)/0.1)] viewer-glass">
+      <div className="relative z-10 flex items-center justify-between px-6 md:px-10 py-4 border-b border-[rgb(var(--fg)/0.1)] viewer-glass">
         <div className="mono-label flex items-center gap-3">
-          <span className="text-[rgb(var(--accent))]">PROJECT</span>
-          <span className="text-[rgb(var(--fg)/0.5)]">#{project.evidence}</span>
+          <span className="hidden sm:inline text-[rgb(var(--accent))]">PROJECT</span>
+          <span className="text-[rgb(var(--fg)/0.5)]">#{project.number}</span>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={onPrev}
             aria-label="Previous project"
-            className="grid place-items-center w-9 h-9 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+            className="grid place-items-center w-11 h-11 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="mono-dim px-2">
+          <span className="mono-dim px-2 whitespace-nowrap">
             {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
           </span>
           <button
             onClick={onNext}
             aria-label="Next project"
-            className="grid place-items-center w-9 h-9 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+            className="grid place-items-center w-11 h-11 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
           <button
+            ref={closeButton}
             onClick={onClose}
             aria-label="Close"
-            className="ml-2 grid place-items-center w-9 h-9 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+            className="ml-2 grid place-items-center w-11 h-11 border border-[rgb(var(--fg)/0.12)] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
           >
             <X className="w-4 h-4" />
           </button>
@@ -471,11 +484,11 @@ function Viewer({
       </div>
 
       <motion.div
-        key={project.evidence}
-        initial={{ opacity: 0, y: 16 }}
+        key={project.slug}
+        initial={reducedMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1], delay: 0.18 }}
-        className="relative z-10 grid grid-cols-1 lg:grid-cols-[320px_1fr_340px] gap-0 h-[calc(100vh-72px)] overflow-y-auto"
+        transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.16, 1, 0.3, 1], delay: reducedMotion ? 0 : 0.18 }}
+        className="viewer-columns relative z-10 grid grid-cols-1 gap-0 h-[calc(100dvh-77px)] overflow-y-auto"
       >
         {/* Sidebar */}
         <aside className="border-r border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
@@ -487,19 +500,12 @@ function Viewer({
 
             <h3 className="mono-label mb-5">Metadata</h3>
 
-            <SidebarRow label="Year" value={project.year} />
-            <SidebarRow label="Context" value={project.context ?? "Personal"} />
-            {project.client && <SidebarRow label="Client" value={project.client} />}
-            {project.time && <SidebarRow label="Time" value={project.time} />}
-            <SidebarRow
-              label="Team"
-              value={project.team ? "Collaborative" : "Solo"}
-            />
+            <SidebarRow label="Context" value={project.context} />
 
             <div className="mt-6">
               <div className="mono-dim mb-2">Tags</div>
               <div className="flex flex-wrap gap-2">
-                {project.tags.map((t) => (
+                {[project.category].map((t) => (
                   <span
                     key={t}
                     className="font-mono text-[10px] uppercase tracking-[0.16em] px-2 py-1 border border-[rgb(var(--fg)/0.15)]"
@@ -524,11 +530,11 @@ function Viewer({
               </div>
             </div>
 
-            {project.links && project.links.length > 0 && (
+            {(project.source.href || project.links.length > 0) && (
               <div className="mt-6">
                 <div className="mono-dim mb-2">Useful Links</div>
                 <ul className="space-y-2">
-                  {project.links.map((l) => (
+                  {[...(project.source.href ? [{ label: project.source.label, href: project.source.href }] : []), ...project.links].map((l) => (
                     <li key={l.href}>
                       <a
                         href={l.href}
@@ -552,13 +558,12 @@ function Viewer({
         </aside>
 
         {/* Brief */}
-        <article className="relative p-6 md:p-14 overflow-y-auto">
+        <article className="relative min-w-0 p-6 md:p-14">
           <div className="max-w-2xl">
-            <div className="mono-label mb-3">{project.type}</div>
-            <h2 className="font-serif text-4xl md:text-6xl uppercase leading-[0.95] tracking-tight">
+            <div className="mono-label mb-3">{project.eyebrow}</div>
+            <h2 id="project-title" className="font-serif text-4xl md:text-6xl uppercase leading-[0.95] tracking-tight [overflow-wrap:anywhere]">
               {project.title}
             </h2>
-            <div className="mono-dim mt-3">{project.subtitle}</div>
 
             <div className="mt-12">
               <div className="mono-label mb-3 flex items-center gap-3">
@@ -566,73 +571,42 @@ function Viewer({
                 Brief
               </div>
               <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">
-                {project.mission}
+                {project.summary}
               </p>
             </div>
 
-            {project.intervention && (
+            {project.contribution && (
               <div className="mt-10">
                 <div className="mono-label mb-3 flex items-center gap-3">
                   <span className="rule-rg" />
                   My Role
                 </div>
                 <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">
-                  {project.intervention}
+                  {project.contribution}
                 </p>
               </div>
             )}
 
-            <div className="mt-14 pt-6 border-t border-[rgb(var(--fg)/0.08)] mono-dim">
-              Press ESC to close. Use arrow keys to navigate.
-            </div>
+            {project.sections.map((section) => (
+              <section key={section.heading} className="mt-10">
+                <h3 className="mono-label mb-3 flex items-center gap-3"><span className="rule-rg" />{section.heading}</h3>
+                <p className="text-base md:text-lg leading-relaxed text-[rgb(var(--fg)/0.92)]">{section.body}</p>
+              </section>
+            ))}
           </div>
         </article>
 
         {/* Gallery */}
-        <aside className="hidden lg:block border-l border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
+        <aside className="min-w-0 border-l border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
           <div className="mono-label mb-5 flex items-center gap-3">
             <span className="rule-rg" />
             Gallery
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {Array.from({ length: 6 }).map((_, i) => {
-              const src = project.gallery?.[i];
-              return (
-                <div
-                  key={i}
-                  className="gallery-slot bracket-frame aspect-[4/5] border border-[rgb(var(--fg)/0.08)] grid place-items-center overflow-hidden relative"
-                >
-                  <span className="br-tl" />
-                  <span className="br-tr" />
-                  <span className="br-bl" />
-                  <span className="br-br" />
-                  {src && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={src}
-                      alt={`${project.title} gallery ${i + 1}`}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      style={{ filter: "grayscale(15%) contrast(1.04)" }}
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  )}
-                  <div className="text-center pointer-events-none relative z-10 bg-black/40 px-1.5 py-0.5">
-                    <div className="font-mono text-[9px] tracking-[0.2em] text-[rgb(var(--fg)/0.6)]">
-                      IMG_{String(i + 1).padStart(2, "0")}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {!project.gallery?.length && (
+          <ProjectGallery key={project.slug} title={project.title} media={project.media} />
+          {!project.media.length && (
             <div className="mt-6 mono-dim text-[10px] leading-relaxed">
-              Awaiting upload. Project captures will populate this gallery as
-              cases are documented.
+              Project screenshots are being prepared.
             </div>
           )}
         </aside>
