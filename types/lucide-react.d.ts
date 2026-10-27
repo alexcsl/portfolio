@@ -22,7 +22,6 @@ declare module "lucide-react" {
   export const Twitter: LucideIcon;
   export const ChevronLeft: LucideIcon;
   export const ChevronRight: LucideIcon;
-  export const Search: LucideIcon;
   export const GraduationCap: LucideIcon;
   export const Briefcase: LucideIcon;
   export const Target: LucideIcon;

@@ -922,7 +922,8 @@ body.viewer-open .scroll-progress {
 }
 
 .case-gallery { padding: 0; }
-.case-gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+.case-rule-heading { display: flex; justify-content: space-between; gap: 1rem; font: 10px "JetBrains Mono", monospace; }
+.case-gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 1rem; margin-top: 1rem; }
 .case-gallery-item { text-align: left; border: 1px solid rgb(var(--fg) / .2); }
 .case-gallery-item img { display: block; width: 100%; height: auto; }
 .case-gallery-item span { display: block; padding: 1rem; font: 11px "JetBrains Mono", monospace; }
