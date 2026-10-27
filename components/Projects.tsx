@@ -268,7 +268,7 @@ function TileVisual({
         className="tile-visual"
         aria-hidden
       >
-        <Image src={cover.src} alt="" fill sizes="(max-width: 640px) 280px, 340px" className="object-cover" />
+        <Image src={cover.src} alt="" fill sizes={showNumeral ? "750px" : "200px"} className="object-cover" />
       </div>
     );
   }
