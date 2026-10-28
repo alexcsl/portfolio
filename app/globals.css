@@ -920,3 +920,34 @@ body.viewer-open .scroll-progress {
     scroll-behavior: auto !important;
   }
 }
+
+.case-gallery { padding: 0; }
+.case-rule-heading { display: flex; justify-content: space-between; gap: 1rem; font: 10px "JetBrains Mono", monospace; }
+.case-gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 1rem; margin-top: 1rem; }
+.case-gallery-item { text-align: left; border: 1px solid rgb(var(--fg) / .2); }
+.case-gallery-item img { display: block; width: 100%; height: auto; }
+.case-gallery-item span { display: block; padding: 1rem; font: 11px "JetBrains Mono", monospace; }
+.case-lightbox button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgb(var(--fg) / .25); }
+.case-lightbox { position: fixed; z-index: 2000; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; background: rgb(0 0 0 / .96); }
+.case-lightbox-bar, .case-lightbox-nav { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1400px; }
+.case-lightbox-bar { color: rgb(var(--gold)); font: 11px "JetBrains Mono", monospace; }
+.case-lightbox figure { min-height: 0; display: flex; flex-direction: column; align-items: center; gap: .8rem; }
+.case-lightbox figure img { max-width: min(100%, 1300px); max-height: 70vh; width: auto; height: auto; object-fit: contain; }
+.case-lightbox figcaption { color: rgb(var(--fg) / .75); font: 11px "JetBrains Mono", monospace; text-align: center; }
+.case-lightbox-nav { justify-content: center; gap: 1rem; }
+
+.tile:focus-visible { outline: 2px solid rgb(var(--gold)); outline-offset: -3px; }
+.viewer-columns > * { min-width: 0; }
+@media (min-width: 1280px) {
+  .viewer-columns { grid-template-columns: 280px minmax(0, 1fr) 300px; }
+  .viewer-columns-text > article { grid-column: 2 / -1; }
+}
+@media (min-width: 1800px) {
+  .viewer-columns { grid-template-columns: 320px minmax(0, 1fr) 340px; }
+}
+@media (max-width: 640px) {
+  .list-thumb { flex-basis: 72px; height: 88px; margin-left: 0; }
+  .list-row > .flex-1 { padding-left: 1rem; }
+  .list-row h3 { font-size: 1.35rem; }
+  .list-row .mono-dim { overflow-wrap: anywhere; }
+}

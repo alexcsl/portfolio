@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import { projects } from "@/lib/projects";
 
 export default function Hero() {
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -163,10 +164,10 @@ export default function Hero() {
           <span className="br-br" />
           <div className="mono-label mb-2">TERMINAL_LOG</div>
           <div className="font-mono text-[11px] leading-relaxed text-[rgb(var(--fg)/0.75)]">
-            <p>&gt;&gt; deploying to base...</p>
-            <p>&gt;&gt; tx confirmed ✓</p>
-            <p>&gt;&gt; indexed on ponder</p>
-            <p className="text-[rgb(var(--accent))]">&gt;&gt; system online_</p>
+            <p>&gt;&gt; loading case files...</p>
+            <p>&gt;&gt; source links ready</p>
+            <p>&gt;&gt; {projects.length} projects indexed</p>
+            <p className="text-[rgb(var(--accent))]">&gt;&gt; portfolio online_</p>
           </div>
         </div>
       </motion.div>
