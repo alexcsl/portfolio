@@ -4,10 +4,11 @@ import * as React from "react";
 import { FileText } from "lucide-react";
 import {
   EDUCATION,
+  ABOUT,
   EXPERIENCE,
   SITE,
   SKILLS_FLAT,
-  SOFT_SKILLS,
+  PRACTICE_AREAS,
 } from "@/lib/data";
 import { useCVModal } from "@/components/CVModal";
 
@@ -81,8 +82,8 @@ export default function About() {
           </div>
 
           <dl className="mt-5 space-y-2">
-            <Row label="Class" value="Fullstack Dev" />
-            <Row label="XP Level" value="JUNIOR · 3 Y" />
+            <Row label="Focus" value="Fullstack & Blockchain" />
+            <Row label="GPA" value="3.73 / 4.00" />
             <Row label="Lang 1" value="ID (Native)" />
             <Row label="Lang 2" value="EN (Fluent)" />
           </dl>
@@ -121,10 +122,7 @@ export default function About() {
           </div>
 
           <p className="font-serif text-2xl md:text-[2rem] leading-[1.25] text-[rgb(var(--fg)/0.95)] max-w-[52ch]">
-            Fullstack and{" "}
-            <span className="text-redact">smart contract</span> developer with
-            engineering depth and a{" "}
-            <span className="text-mint">business mindset</span>.
+            {ABOUT.body}
           </p>
 
           {/* Education */}
@@ -199,9 +197,9 @@ export default function About() {
           </div>
 
           <div className="mt-7">
-            <div className="mono-dim mb-3">Soft Skills</div>
+            <div className="mono-dim mb-3">Practice Areas</div>
             <div className="flex flex-wrap gap-2">
-              {SOFT_SKILLS.map((s, i) => (
+              {PRACTICE_AREAS.map((s, i) => (
                 <span
                   key={s}
                   className={`font-mono text-[10px] uppercase tracking-[0.14em] px-2.5 py-1.5 border whitespace-nowrap ${
