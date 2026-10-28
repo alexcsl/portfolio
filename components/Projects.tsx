@@ -488,7 +488,7 @@ function Viewer({
         initial={reducedMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.16, 1, 0.3, 1], delay: reducedMotion ? 0 : 0.18 }}
-        className="viewer-columns relative z-10 grid grid-cols-1 gap-0 h-[calc(100dvh-77px)] overflow-y-auto"
+        className={`viewer-columns ${project.media.length ? "" : "viewer-columns-text"} relative z-10 grid grid-cols-1 gap-0 h-[calc(100dvh-77px)] overflow-y-auto`}
       >
         {/* Sidebar */}
         <aside className="border-r border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
@@ -501,6 +501,7 @@ function Viewer({
             <h3 className="mono-label mb-5">Metadata</h3>
 
             <SidebarRow label="Context" value={project.context} />
+            <SidebarRow label="Status" value={project.status} />
 
             <div className="mt-6">
               <div className="mono-dim mb-2">Tags</div>
@@ -597,19 +598,14 @@ function Viewer({
         </article>
 
         {/* Gallery */}
-        <aside className="min-w-0 border-l border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
+        {project.media.length > 0 && <aside className="min-w-0 border-l border-[rgb(var(--fg)/0.08)] p-6 md:p-8 viewer-glass">
           <div className="mono-label mb-5 flex items-center gap-3">
             <span className="rule-rg" />
             Gallery
           </div>
 
           <ProjectGallery key={project.slug} title={project.title} media={project.media} />
-          {!project.media.length && (
-            <div className="mt-6 mono-dim text-[10px] leading-relaxed">
-              Project screenshots are being prepared.
-            </div>
-          )}
-        </aside>
+        </aside>}
       </motion.div>
     </motion.div>
   );
