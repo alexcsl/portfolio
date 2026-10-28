@@ -6,7 +6,7 @@ import Hud from "@/components/Hud";
 import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
-  title: "Alexander Christian · Case File KH-03",
+  title: "Alexander Christian | Portfolio",
   description:
     "Selected research tools, desktop software, community commerce, and open-source contributions by Alexander Christian.",
   keywords: [
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Alexander Christian Suryanto Linggodigdo" }],
   creator: "Alexander Christian",
   openGraph: {
-    title: "Alexander Christian, Blockchain and AI Developer",
+    title: "Alexander Christian | Portfolio",
     description:
       "Selected software projects and open-source contributions by Alexander Christian.",
     type: "website",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alexander Christian, Blockchain and AI Developer",
+    title: "Alexander Christian | Portfolio",
     description:
       "Selected software projects and open-source contributions by Alexander Christian.",
     creator: "@alexcsl10",
