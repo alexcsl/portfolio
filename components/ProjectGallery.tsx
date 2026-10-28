@@ -46,7 +46,7 @@ export default function ProjectGallery({ title, media }: { title: string; media:
 
   return (
     <section className="case-gallery" aria-label={`${title} gallery`}>
-      <div className="case-rule-heading"><span>Field evidence</span><span>{String(media.length).padStart(2, "0")} captures</span></div>
+      <div className="case-rule-heading"><span>Project showcase</span><span>{String(media.length).padStart(2, "0")} {media.length === 1 ? "image" : "images"}</span></div>
       <div className="case-gallery-grid">
         {media.map((item, index) => (
           <button key={item.src} type="button" className="case-gallery-item" onClick={(event) => { trigger.current = event.currentTarget; setActive(index); }} aria-label={`Open ${item.caption}`}>

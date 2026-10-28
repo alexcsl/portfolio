@@ -940,6 +940,7 @@ body.viewer-open .scroll-progress {
 .viewer-columns > * { min-width: 0; }
 @media (min-width: 1280px) {
   .viewer-columns { grid-template-columns: 280px minmax(0, 1fr) 300px; }
+  .viewer-columns-text > article { grid-column: 2 / -1; }
 }
 @media (min-width: 1800px) {
   .viewer-columns { grid-template-columns: 320px minmax(0, 1fr) 340px; }
