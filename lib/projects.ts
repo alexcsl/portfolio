@@ -76,8 +76,15 @@ export const projects: Project[] = [
       { heading: "Problem", body: "A fictional agency needs distinct workflows for engineering, research, missions, medical care, station operations, and administration." },
       { heading: "Workflows", body: "The repository documents twelve departmental subsystems, including missions, research proposals, inventory, incident reports, and personnel administration." },
       { heading: "Engineering choices", body: "The desktop application combines Tauri, a SvelteKit interface, Rust command handlers, and PostgreSQL-backed operational records." },
+      { heading: "Demonstrated scope", body: "The native demo covers medical inventory, supply entry, quantity updates, assigned shifts, and fictional treatment records using local fixtures. Other departmental workflows and packaged releases remain unverified by this demo." },
     ],
-    media: [],
+    media: [
+      { kind: "application", src: "/assets/projects/rusa/01-medical-inventory.png", width: 1920, height: 1200, alt: "Native RUSA medical department showing fictional medicines, equipment and supplies with an item quantity panel.", caption: "Medical inventory and item details. Native coursework demo with fictional local records.", capturedAt: "2026-10-28", sourceRevision: "15181c03bc107aa2b62be44e6583fc6b46e40e52; source-manifest:d9dc3061a53f9eacd301037013b80ce821eb8cc7aa45bc85c25e9f416d029848" },
+      { kind: "application", src: "/assets/projects/rusa/02-add-inventory.png", width: 1920, height: 1200, alt: "Native RUSA inventory form populated with a fictional supply name, type, quantity and unit.", caption: "New supply item form. Native coursework demo with fictional local records.", capturedAt: "2026-10-28", sourceRevision: "15181c03bc107aa2b62be44e6583fc6b46e40e52; source-manifest:d9dc3061a53f9eacd301037013b80ce821eb8cc7aa45bc85c25e9f416d029848" },
+      { kind: "application", src: "/assets/projects/rusa/03-quantity-update.png", width: 1920, height: 1200, alt: "Native RUSA item details showing a fictional medicine kit updated to thirty packs.", caption: "Updated inventory quantity. Native coursework demo with fictional local records.", capturedAt: "2026-10-28", sourceRevision: "15181c03bc107aa2b62be44e6583fc6b46e40e52; source-manifest:d9dc3061a53f9eacd301037013b80ce821eb8cc7aa45bc85c25e9f416d029848" },
+      { kind: "application", src: "/assets/projects/rusa/04-work-schedule.png", width: 1920, height: 1200, alt: "Native RUSA work schedule showing two fictional upcoming medical shifts and a training specialty.", caption: "Assigned medical shifts. Native coursework demo with fictional local records.", capturedAt: "2026-10-28", sourceRevision: "15181c03bc107aa2b62be44e6583fc6b46e40e52; source-manifest:d9dc3061a53f9eacd301037013b80ce821eb8cc7aa45bc85c25e9f416d029848" },
+      { kind: "application", src: "/assets/projects/rusa/05-patient-record.png", width: 1920, height: 1200, alt: "Native RUSA patient panel showing a fictional training record with synthetic treatment and follow-up entries.", caption: "Patient treatment history. Native coursework demo with fictional local records.", capturedAt: "2026-10-28", sourceRevision: "15181c03bc107aa2b62be44e6583fc6b46e40e52; source-manifest:d9dc3061a53f9eacd301037013b80ce821eb8cc7aa45bc85c25e9f416d029848" },
+    ],
   },
   {
     slug: "warung-cek-harga",
