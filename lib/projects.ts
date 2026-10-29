@@ -182,7 +182,10 @@ export const projects: Project[] = [
       { heading: "Product workflows", body: "The source separates accounts, posts, stories, messaging, notifications, and media, with frontend routes for feed, explore, reels, messages, and profiles." },
       { heading: "Architecture", body: "A Vue interface connects to separate backend services. The local stack includes PostgreSQL, Redis, RabbitMQ, and MinIO, making service boundaries and integration a central part of the project." },
     ],
-    media: [],
+    media: [
+      { kind: "application", src: "/assets/projects/hoshibmatchi/02-explore.png", width: 1440, height: 1000, alt: "Hoshibmatchi explore page showing a grid of sample posts.", caption: "Explore and discover posts. Demo data.", capturedAt: "2026-10-29", sourceRevision: "24d492eff76a49ae246227662fd2ca0a0957693b" },
+      { kind: "application", src: "/assets/projects/hoshibmatchi/04-messages.png", width: 1440, height: 1000, alt: "Hoshibmatchi direct messages showing a sample conversation between two accounts.", caption: "Direct messages between demo accounts.", capturedAt: "2026-10-29", sourceRevision: "24d492eff76a49ae246227662fd2ca0a0957693b" },
+    ],
   },
   {
     slug: "taskalender",
