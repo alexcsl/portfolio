@@ -201,7 +201,13 @@ export const projects: Project[] = [
       { heading: "Workflows", body: "The source includes user-scoped task records, notes organized in folders, transaction records, categories, and user profiles." },
       { heading: "Engineering choices", body: "Kotlin view models connect Android XML screens to Firebase Authentication and Firestore-backed repositories." },
     ],
-    media: [],
+    media: [
+      { kind: "application", src: "/assets/projects/taskalender/01-calendar-workspace.png", width: 1080, height: 2160, alt: "TasKalender Android calendar showing the selected day and a populated list of study and project tasks.", caption: "Calendar workspace. Native Android demo.", capturedAt: "2026-10-29", sourceRevision: "ab1e880d7b9a362cb1342aaab109b3d5a7b76057; apk:8ffba40190e3df427681d44d3b4a2fcfb1f5442eaca91dffa9a8ba56b2d5f737" },
+      { kind: "application", src: "/assets/projects/taskalender/02-task-management.png", width: 1080, height: 2160, alt: "TasKalender task management screen with sample tasks, categories, due dates and completion controls.", caption: "Task management and completion. Demo data.", capturedAt: "2026-10-29", sourceRevision: "ab1e880d7b9a362cb1342aaab109b3d5a7b76057" },
+      { kind: "application", src: "/assets/projects/taskalender/03-cash-overview.png", width: 1080, height: 2160, alt: "TasKalender cash overview displaying a rupiah balance, income and expense chart, and sample transactions.", caption: "Cash overview and transaction history. Demo data.", capturedAt: "2026-10-29", sourceRevision: "ab1e880d7b9a362cb1342aaab109b3d5a7b76057" },
+      { kind: "application", src: "/assets/projects/taskalender/04-note-folders.png", width: 1080, height: 2160, alt: "TasKalender notes organized into Study Notes, Project Ideas and Personal folders.", caption: "Notes organized by folder. Native Android demo.", capturedAt: "2026-10-29", sourceRevision: "ab1e880d7b9a362cb1342aaab109b3d5a7b76057" },
+      { kind: "application", src: "/assets/projects/taskalender/05-study-notes.png", width: 1080, height: 2160, alt: "TasKalender Study Notes folder containing Android architecture notes and a weekly study plan.", caption: "Study notes and previews. Demo data.", capturedAt: "2026-10-29", sourceRevision: "ab1e880d7b9a362cb1342aaab109b3d5a7b76057" },
+    ],
   },
   {
     slug: "hwixel",
