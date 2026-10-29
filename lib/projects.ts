@@ -252,7 +252,13 @@ export const projects: Project[] = [
       { heading: "Engineering choices", body: "An Expo and React Native app communicates through the backend API rather than accessing the database or WhatsApp directly." },
       { heading: "Hackathon context", body: "Built for the Health track at Garuda Hacks 7.0 as a family-companion prototype." },
     ],
-    media: [],
+    media: [
+      { kind: "application", src: "/assets/projects/lively/01-family-dashboard.png", width: 1080, height: 2400, alt: "Lively family dashboard with a sample routine overview and message shortcut.", caption: "Family dashboard. Native Android demo.", capturedAt: "2026-10-29", sourceRevision: "a3be50a6f5f96976d889bea0dab5f4cad74cf09d" },
+      { kind: "application", src: "/assets/projects/lively/02-companion-conversation.png", width: 1080, height: 2400, alt: "Lively companion conversation with sample family messages.", caption: "Companion conversation. Demo data.", capturedAt: "2026-10-29", sourceRevision: "a3be50a6f5f96976d889bea0dab5f4cad74cf09d" },
+      { kind: "application", src: "/assets/projects/lively/03-progress-trends.png", width: 1080, height: 2400, alt: "Lively progress screen showing a sample activity trend and calendar.", caption: "Activity trends. Demo data.", capturedAt: "2026-10-29", sourceRevision: "a3be50a6f5f96976d889bea0dab5f4cad74cf09d" },
+      { kind: "application", src: "/assets/projects/lively/04-alert-details.png", width: 1080, height: 2400, alt: "Lively sample alert detail with context and follow-up actions.", caption: "Alert details. Demo data.", capturedAt: "2026-10-29", sourceRevision: "a3be50a6f5f96976d889bea0dab5f4cad74cf09d" },
+      { kind: "application", src: "/assets/projects/lively/05-family-messages.png", width: 1080, height: 2400, alt: "Lively family message screen showing sample pending and delivered messages.", caption: "Family messages. Demo data.", capturedAt: "2026-10-29", sourceRevision: "a3be50a6f5f96976d889bea0dab5f4cad74cf09d" },
+    ],
   },
   {
     slug: "octora",
