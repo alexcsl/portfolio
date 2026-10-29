@@ -183,8 +183,10 @@ export const projects: Project[] = [
       { heading: "Architecture", body: "A Vue interface connects to separate backend services. The local stack includes PostgreSQL, Redis, RabbitMQ, and MinIO, making service boundaries and integration a central part of the project." },
     ],
     media: [
-      { kind: "application", src: "/assets/projects/hoshibmatchi/02-explore.png", width: 1440, height: 1000, alt: "Hoshibmatchi explore page showing a grid of sample posts.", caption: "Explore and discover posts. Demo data.", capturedAt: "2026-10-29", sourceRevision: "24d492eff76a49ae246227662fd2ca0a0957693b" },
-      { kind: "application", src: "/assets/projects/hoshibmatchi/04-messages.png", width: 1440, height: 1000, alt: "Hoshibmatchi direct messages showing a sample conversation between two accounts.", caption: "Direct messages between demo accounts.", capturedAt: "2026-10-29", sourceRevision: "24d492eff76a49ae246227662fd2ca0a0957693b" },
+      { kind: "application", src: "/assets/projects/hoshibmatchi/01-feed.png", width: 1440, height: 1000, alt: "Hoshibmatchi feed displaying sample posts from demo accounts.", caption: "Social feed. Demo data.", capturedAt: "2026-10-29", sourceRevision: "1fbc32684929de1f0c5c587412330b5be1b215bf" },
+      { kind: "application", src: "/assets/projects/hoshibmatchi/02-explore.png", width: 1440, height: 1000, alt: "Hoshibmatchi explore page showing a grid of sample posts.", caption: "Explore and discover posts. Demo data.", capturedAt: "2026-10-29", sourceRevision: "1fbc32684929de1f0c5c587412330b5be1b215bf" },
+      { kind: "application", src: "/assets/projects/hoshibmatchi/03-profile.png", width: 1440, height: 1000, alt: "Hoshibmatchi demo profile with a sample post.", caption: "Profile and posts. Demo data.", capturedAt: "2026-10-29", sourceRevision: "1fbc32684929de1f0c5c587412330b5be1b215bf" },
+      { kind: "application", src: "/assets/projects/hoshibmatchi/04-messages.png", width: 1440, height: 1000, alt: "Hoshibmatchi direct messages showing a sample conversation between two accounts.", caption: "Direct messages between demo accounts.", capturedAt: "2026-10-29", sourceRevision: "1fbc32684929de1f0c5c587412330b5be1b215bf" },
     ],
   },
   {
