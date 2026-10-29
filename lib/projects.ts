@@ -237,7 +237,11 @@ export const projects: Project[] = [
       { heading: "Phased full-stack work", body: "The pull requests document work on phases 4 and 5 for project hubs, members and task management; phase 7 attendance and a UI redesign; phase 8 peer evaluation; phase 9 shared links; and phase 10 notifications." },
       { heading: "UI and data layers", body: "The changes pair fragments, view models and XML layouts with repositories, Firebase sources, local persistence and scheduled reminders. Both teammates worked across the stack in different phases." },
     ],
-    media: [],
+    media: [
+      { kind: "application", src: "/assets/projects/hwixel/01-dashboard.png", width: 1080, height: 2160, alt: "Hwixel Android dashboard for a demo student account.", caption: "Student dashboard. Native Android demo.", capturedAt: "2026-10-29", sourceRevision: "4599501509705b4551802a74bfea26290fe10ab2" },
+      { kind: "application", src: "/assets/projects/hwixel/04-new-project.png", width: 1080, height: 2160, alt: "Hwixel new project form with name, goals, description and deadline fields.", caption: "New project form. Demo account.", capturedAt: "2026-10-29", sourceRevision: "4599501509705b4551802a74bfea26290fe10ab2" },
+      { kind: "application", src: "/assets/projects/hwixel/02-profile.png", width: 1080, height: 2160, alt: "Hwixel demo student profile with theme and language preferences.", caption: "Profile and preferences. Demo account.", capturedAt: "2026-10-29", sourceRevision: "4599501509705b4551802a74bfea26290fe10ab2" },
+    ],
   },
   {
     slug: "lively",
