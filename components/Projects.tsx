@@ -4,7 +4,8 @@ import * as React from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ExternalLink, Github, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, X } from "lucide-react";
+import { Github } from "@/components/SocialIcons";
 import { projects as PROJECTS, type Project } from "@/lib/projects";
 import ProjectGallery from "@/components/ProjectGallery";
 
