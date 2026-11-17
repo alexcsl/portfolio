@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { FileText, Github, Linkedin, Mail, Twitter } from "lucide-react";
+import { FileText, Mail } from "lucide-react";
+import { Github, Linkedin, Twitter } from "@/components/SocialIcons";
 import { SITE } from "@/lib/data";
 import { useCVModal } from "@/components/CVModal";
 

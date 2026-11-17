@@ -6,33 +6,33 @@ import Hud from "@/components/Hud";
 import ScrollProgress from "@/components/ScrollProgress";
 
 export const metadata: Metadata = {
-  title: "Alexander Christian · Case File KH-03",
+  title: "Alexander Christian | Portfolio",
   description:
-    "Fullstack and blockchain developer. Shipped work across Solidity, Next.js, Rust, AI/ML for Indonesian markets and L2 ecosystems.",
+    "Selected research tools, desktop software, community commerce, and open-source contributions by Alexander Christian.",
   keywords: [
     "Alexander Christian",
     "alexcsl",
     "blockchain developer",
     "Solidity",
     "Next.js",
-    "Base L2",
-    "Lisk",
+    "research tools",
+    "open-source",
     "portfolio",
   ],
   authors: [{ name: "Alexander Christian Suryanto Linggodigdo" }],
   creator: "Alexander Christian",
   openGraph: {
-    title: "Alexander Christian, Blockchain and AI Developer",
+    title: "Alexander Christian | Portfolio",
     description:
-      "Fullstack developer building on-chain applications across Base, Lisk, and beyond.",
+      "Selected software projects and open-source contributions by Alexander Christian.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alexander Christian, Blockchain and AI Developer",
+    title: "Alexander Christian | Portfolio",
     description:
-      "Fullstack developer building on-chain applications across Base, Lisk, and beyond.",
+      "Selected software projects and open-source contributions by Alexander Christian.",
     creator: "@alexcsl10",
   },
   robots: { index: true, follow: true },

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import { projects } from "@/lib/projects";
 
 export default function Hero() {
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -133,7 +134,7 @@ export default function Hero() {
         className="hidden lg:block absolute top-[16%] left-[6%] z-[5] will-change-transform"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div className="bracket-frame p-3 bg-black/55 backdrop-blur-sm border border-[rgb(var(--fg)/0.1)] floaty">
+        <div className="bracket-frame p-3 bg-black/55 backdrop-blur-[4px] border border-[rgb(var(--fg)/0.1)] floaty">
           <span className="br-tl" />
           <span className="br-tr" />
           <span className="br-bl" />
@@ -156,17 +157,17 @@ export default function Hero() {
         className="hidden lg:block absolute bottom-[16%] right-[8%] z-[5] will-change-transform"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div className="bracket-frame p-3 bg-black/65 backdrop-blur-sm border border-[rgb(var(--fg)/0.1)] w-[260px]">
+        <div className="bracket-frame p-3 bg-black/65 backdrop-blur-[4px] border border-[rgb(var(--fg)/0.1)] w-[260px]">
           <span className="br-tl" />
           <span className="br-tr" />
           <span className="br-bl" />
           <span className="br-br" />
           <div className="mono-label mb-2">TERMINAL_LOG</div>
           <div className="font-mono text-[11px] leading-relaxed text-[rgb(var(--fg)/0.75)]">
-            <p>&gt;&gt; deploying to base...</p>
-            <p>&gt;&gt; tx confirmed ✓</p>
-            <p>&gt;&gt; indexed on ponder</p>
-            <p className="text-[rgb(var(--accent))]">&gt;&gt; system online_</p>
+            <p>&gt;&gt; loading case files...</p>
+            <p>&gt;&gt; source links ready</p>
+            <p>&gt;&gt; {projects.length} projects indexed</p>
+            <p className="text-[rgb(var(--accent))]">&gt;&gt; portfolio online_</p>
           </div>
         </div>
       </motion.div>
