@@ -25,6 +25,8 @@ npm run dev
 
 Use Node.js 24.22.1 or newer within the 24.x line. The production content security policy excludes `unsafe-eval`; development mode permits it for Next.js tooling.
 
+Type checking uses the TypeScript 7 compiler through the `@typescript/native` alias. The `typescript` alias supplies the TypeScript 6 API required by ESLint and Next.js tooling.
+
 Open [http://localhost:3000](http://localhost:3000).
 
 ## Build

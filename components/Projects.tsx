@@ -187,7 +187,7 @@ function TileRail({
         type="button"
         aria-label="Previous"
         onClick={() => scrollByAmount(-1)}
-        className="hidden sm:grid place-items-center absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-20 w-11 h-11 border border-[rgb(var(--fg)/0.15)] bg-black/70 backdrop-blur hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+        className="hidden sm:grid place-items-center absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-20 w-11 h-11 border border-[rgb(var(--fg)/0.15)] bg-black/70 backdrop-blur-[8px] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
@@ -195,7 +195,7 @@ function TileRail({
         type="button"
         aria-label="Next"
         onClick={() => scrollByAmount(1)}
-        className="hidden sm:grid place-items-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-20 w-11 h-11 border border-[rgb(var(--fg)/0.15)] bg-black/70 backdrop-blur hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
+        className="hidden sm:grid place-items-center absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-20 w-11 h-11 border border-[rgb(var(--fg)/0.15)] bg-black/70 backdrop-blur-[8px] hover:border-[rgb(var(--accent))] hover:text-[rgb(var(--accent))] transition"
       >
         <ChevronRight className="w-4 h-4" />
       </button>

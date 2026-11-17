@@ -134,7 +134,7 @@ export default function Hero() {
         className="hidden lg:block absolute top-[16%] left-[6%] z-[5] will-change-transform"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div className="bracket-frame p-3 bg-black/55 backdrop-blur-sm border border-[rgb(var(--fg)/0.1)] floaty">
+        <div className="bracket-frame p-3 bg-black/55 backdrop-blur-[4px] border border-[rgb(var(--fg)/0.1)] floaty">
           <span className="br-tl" />
           <span className="br-tr" />
           <span className="br-bl" />
@@ -157,7 +157,7 @@ export default function Hero() {
         className="hidden lg:block absolute bottom-[16%] right-[8%] z-[5] will-change-transform"
         style={{ transformStyle: "preserve-3d" }}
       >
-        <div className="bracket-frame p-3 bg-black/65 backdrop-blur-sm border border-[rgb(var(--fg)/0.1)] w-[260px]">
+        <div className="bracket-frame p-3 bg-black/65 backdrop-blur-[4px] border border-[rgb(var(--fg)/0.1)] w-[260px]">
           <span className="br-tl" />
           <span className="br-tr" />
           <span className="br-bl" />
